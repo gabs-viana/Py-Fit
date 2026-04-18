@@ -1,0 +1,5 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "totvsLanguageServer.welcomePage": false,
+    "totvsLanguageServer.editor.linter.includes": "C:\\Users\\gabriel.viana\\OneDrive - CONASA INFRAESTRUTURA S.A\\include"
+}
