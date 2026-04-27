@@ -1,0 +1,87 @@
+{
+  "resumo": {
+    "tempo_s": 2514.0,
+    "dist_km": 4.044179999999992,
+    "fc_media": 133.25670804965958,
+    "eficiencia": 0.030348791135474274,
+    "drift": 0.10227015448185386,
+    "fadiga": "alta",
+    "variacao_fc": 0.5412660256410257,
+    "tipo_treino": "base",
+    "score": 0.027245015577711803
+  },
+  "blocos": [
+    {
+      "tipo": "caminhada",
+      "duracao_aprox": 664,
+      "fc_media": 110.97575757575757,
+      "vel_media": 1.446852409638554
+    },
+    {
+      "tipo": "corrida",
+      "duracao_aprox": 46,
+      "fc_media": 144.6086956521739,
+      "vel_media": 2.2745652173913045
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_aprox": 147,
+      "fc_media": 135.67586206896553,
+      "vel_media": 1.532857142857143
+    },
+    {
+      "tipo": "corrida",
+      "duracao_aprox": 42,
+      "fc_media": 149.83333333333334,
+      "vel_media": 2.97452380952381
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_aprox": 124,
+      "fc_media": 142.3709677419355,
+      "vel_media": 1.5313709677419354
+    },
+    {
+      "tipo": "corrida",
+      "duracao_aprox": 44,
+      "fc_media": 158.8372093023256,
+      "vel_media": 2.8038636363636367
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_aprox": 135,
+      "fc_media": 145.85185185185185,
+      "vel_media": 1.4322962962962962
+    },
+    {
+      "tipo": "corrida",
+      "duracao_aprox": 42,
+      "fc_media": 162.3095238095238,
+      "vel_media": 3.118333333333333
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_aprox": 158,
+      "fc_media": 146.92948717948718,
+      "vel_media": 1.5029746835443039
+    },
+    {
+      "tipo": "corrida",
+      "duracao_aprox": 39,
+      "fc_media": 169.07692307692307,
+      "vel_media": 3.717948717948718
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_aprox": 544,
+      "fc_media": 135.76437847866418,
+      "vel_media": 1.3922324723247232
+    },
+    {
+      "tipo": "corrida",
+      "duracao_aprox": 21,
+      "fc_media": 147.52380952380952,
+      "vel_media": 3.6385714285714283
+    }
+  ]
+}

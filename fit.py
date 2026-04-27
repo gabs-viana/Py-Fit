@@ -1,186 +1,291 @@
 from fitparse import FitFile
 import json
 from datetime import datetime
+import statistics
 
-fitfile = FitFile('Zepp20260414180951.fit')
+IDADE = 19
+FC_MAX_TEO = 220 - IDADE
+CAD_CORRIDA = 75
 
-registros = []
-
-# =========================
-# EXTRAÇÃO + NORMALIZAÇÃO
-# =========================
-for record in fitfile.get_messages('record'):
-    data = {}
-
-    for d in record:
-        value = d.value
-
-        if isinstance(value, datetime):
-            value = value.isoformat()
-
-        data[d.name] = value
-
-    registros.append(data)
+fitfile = FitFile('Zepp20260421180225.fit')
 
 # =========================
-# LIMPEZA + CAMPOS IMPORTANTES
+# EXTRAÇÃO
 # =========================
 dados = []
-for r in registros:
-    if "timestamp" not in r:
-        continue
 
-    dados.append({
-        "t": r.get("timestamp"),
-        "hr": r.get("heart_rate"),
-        "cad": r.get("cadence"),
-        "spd": r.get("speed"),
-        "alt": r.get("altitude"),
-    })
+for record in fitfile.get_messages('record'):
+    row = {}
+    for d in record:
+        val = d.value
+        if isinstance(val, datetime):
+            val = val.isoformat()
+        row[d.name] = val
 
-# =========================
-# DISTÂNCIA + TEMPO REAL
-# =========================
-dist_acumulada = 0
-tempo_total = 0
-ultima_t = None
-
-for d in dados:
-    if d["t"] is None:
-        d["dist_calc"] = dist_acumulada
-        continue
-
-    t_atual = datetime.fromisoformat(d["t"])
-
-    if ultima_t is not None:
-        delta = (t_atual - ultima_t).total_seconds()
-
-        # tempo real
-        tempo_total += delta
-
-        # distância só se tiver velocidade
-        if d["spd"] is not None:
-            dist_acumulada += d["spd"] * delta
-
-    d["dist_calc"] = dist_acumulada
-    ultima_t = t_atual
-
-dist_total = dist_acumulada
-
-# =========================
-# ESTATÍSTICAS
-# =========================
-hrs = [d["hr"] for d in dados if d["hr"] is not None]
-spds = [d["spd"] for d in dados if d["spd"] is not None]
-cads = [d["cad"] for d in dados if d["cad"] is not None]
-
-def media(lista):
-    return sum(lista)/len(lista) if lista else None
-
-def safe_max(lista):
-    return max(lista) if lista else None
-
-# pace correto
-pace_medio = (tempo_total / (dist_total/1000)) if dist_total else None
-
-# =========================
-# SPLITS POR KM (TEMPO REAL)
-# =========================
-splits = []
-km_atual = 1
-inicio_idx = 0
-
-for i, d in enumerate(dados):
-    if d["dist_calc"] >= km_atual * 1000:
-        trecho = dados[inicio_idx:i]
-
-        # tempo real do trecho
-        tempo_km = 0
-        ultima_t_split = None
-
-        for x in trecho:
-            if x["t"] is None:
-                continue
-
-            t_split = datetime.fromisoformat(x["t"])
-
-            if ultima_t_split is not None:
-                tempo_km += (t_split - ultima_t_split).total_seconds()
-
-            ultima_t_split = t_split
-
-        hr_km = media([x["hr"] for x in trecho if x["hr"] is not None])
-        cad_km = media([x["cad"] for x in trecho if x["cad"] is not None])
-
-        splits.append({
-            "km": km_atual,
-            "pace_s": tempo_km,
-            "fc_media": hr_km,
-            "cad_media": cad_km
+    if "timestamp" in row:
+        dados.append({
+            "t": row.get("timestamp"),
+            "hr": row.get("heart_rate"),
+            "cad": row.get("cadence"),
+            "spd": row.get("speed")
         })
 
-        km_atual += 1
-        inicio_idx = i
-
 # =========================
-# ZONAS DE FC
+# TEMPO + DISTÂNCIA
 # =========================
-fc_max = safe_max(hrs)
-
-zonas = {"z1":0,"z2":0,"z3":0,"z4":0,"z5":0}
-
-for h in hrs:
-    if not fc_max:
-        continue
-
-    perc = h / fc_max
-
-    if perc < 0.6:
-        zonas["z1"] += 1
-    elif perc < 0.7:
-        zonas["z2"] += 1
-    elif perc < 0.8:
-        zonas["z3"] += 1
-    elif perc < 0.9:
-        zonas["z4"] += 1
-    else:
-        zonas["z5"] += 1
-
-# =========================
-# DOWNSAMPLE INTELIGENTE (~5s real)
-# =========================
-serie_reduzida = []
+dist = 0
+tempo = 0
 ultima_t = None
 
 for d in dados:
-    if d["t"] is None:
+    if not d["t"]:
         continue
 
-    t_atual = datetime.fromisoformat(d["t"])
+    t = datetime.fromisoformat(d["t"])
 
-    if ultima_t is None or (t_atual - ultima_t).total_seconds() >= 5:
-        serie_reduzida.append(d)
-        ultima_t = t_atual
+    if ultima_t:
+        delta = (t - ultima_t).total_seconds()
+        tempo += delta
+        if d["spd"]:
+            dist += d["spd"] * delta
+
+    d["dist"] = dist
+    ultima_t = t
+
+dist_km = dist / 1000
 
 # =========================
-# OUTPUT FINAL
+# LISTAS
+# =========================
+hrs = [d["hr"] for d in dados if d["hr"]]
+spds = [d["spd"] for d in dados if d["spd"]]
+
+def media(l): return sum(l)/len(l) if l else None
+
+fc_media = media(hrs)
+
+# =========================
+# CONSISTÊNCIA DE RITMO
+# =========================
+desvio_vel = statistics.pstdev(spds) if len(spds) > 1 else None
+
+# =========================
+# EFICIÊNCIA GLOBAL
+# =========================
+eficiencia = (dist_km / fc_media) if fc_media else None
+
+# =========================
+# EFICIÊNCIA DINÂMICA (janela 60s)
+# =========================
+eficiencia_janelas = []
+janela = []
+tempo_janela = 0
+ultima_t = None
+
+for d in dados:
+    if not d["t"]:
+        continue
+
+    t = datetime.fromisoformat(d["t"])
+
+    if ultima_t:
+        delta = (t - ultima_t).total_seconds()
+        tempo_janela += delta
+
+    janela.append(d)
+
+    if tempo_janela >= 60:
+        hrs_j = [x["hr"] for x in janela if x["hr"]]
+        spd_j = [x["spd"] for x in janela if x["spd"]]
+
+        if hrs_j and spd_j:
+            eff = (media(spd_j) * 3.6) / media(hrs_j)
+            eficiencia_janelas.append(eff)
+
+        janela = []
+        tempo_janela = 0
+
+    ultima_t = t
+
+# =========================
+# DETECÇÃO DE BLOCOS
+# =========================
+blocos = []
+estado = None
+buffer = []
+
+tempo_corrida = 0
+tempo_total = 0
+
+ultima_t = None
+
+for d in dados:
+    if not d["t"] or not d["cad"]:
+        continue
+
+    t = datetime.fromisoformat(d["t"])
+
+    if ultima_t:
+        delta = (t - ultima_t).total_seconds()
+        tempo_total += delta
+
+        if estado == "corrida":
+            tempo_corrida += delta
+
+    atual = "corrida" if d["cad"] >= CAD_CORRIDA else "caminhada"
+
+    if atual != estado:
+        if buffer:
+            hrs_b = [x["hr"] for x in buffer if x["hr"]]
+
+            blocos.append({
+                "tipo": estado,
+                "duracao_s": len(buffer),
+                "fc_media": media(hrs_b)
+            })
+        buffer = []
+        estado = atual
+
+    buffer.append(d)
+    ultima_t = t
+
+# =========================
+# % TEMPO CORRENDO
+# =========================
+pct_corrida = (tempo_corrida / tempo_total) if tempo_total else None
+
+# =========================
+# RECUPERAÇÃO FC (pós corrida)
+# =========================
+recuperacoes = []
+
+for i in range(1, len(dados)-10):
+    if dados[i]["cad"] and dados[i]["cad"] >= CAD_CORRIDA:
+        fim_hr = dados[i]["hr"]
+
+        for j in range(i+1, min(i+10, len(dados))):
+            if dados[j]["cad"] and dados[j]["cad"] < CAD_CORRIDA:
+                if dados[j]["hr"] and fim_hr:
+                    recuperacoes.append(fim_hr - dados[j]["hr"])
+                break
+
+recuperacao_media = media(recuperacoes)
+
+# =========================
+# DETECÇÃO DE QUEBRA
+# =========================
+quebras = 0
+
+for i in range(1, len(dados)):
+    if dados[i]["spd"] and dados[i]["hr"] and dados[i-1]["spd"] and dados[i-1]["hr"]:
+        if dados[i]["spd"] < dados[i-1]["spd"] and dados[i]["hr"] > dados[i-1]["hr"]:
+            quebras += 1
+
+# =========================
+# CARDIAC DRIFT
+# =========================
+drift = None
+if len(hrs) > 10:
+    meio = len(hrs) // 2
+    fc_inicio = media(hrs[:meio])
+    fc_final = media(hrs[meio:])
+    
+    if fc_inicio:
+        drift = (fc_final - fc_inicio) / fc_inicio
+
+# =========================
+# PICO DE PERFORMANCE (melhor janela)
+# =========================
+pico_eficiencia = max(eficiencia_janelas) if eficiencia_janelas else None
+
+# =========================
+# SCORE FINAL (0–10)
+# =========================
+score = 0
+
+if eficiencia:
+    if eficiencia > 0.03:
+        score += 3
+    elif eficiencia > 0.025:
+        score += 2
+    else:
+        score += 1
+
+if drift is not None:
+    if drift < 0.03:
+        score += 3
+    elif drift < 0.06:
+        score += 2
+    else:
+        score += 1
+
+if quebras < 10:
+    score += 2
+else:
+    score += 1
+
+if desvio_vel and desvio_vel < 0.5:
+    score += 2
+else:
+    score += 1
+
+# =========================
+# STATUS FISIOLÓGICO
+# =========================
+status = "indefinido"
+
+if drift is not None:
+    if drift > 0.06:
+        status = "fadiga alta"
+    elif drift > 0.03:
+        status = "moderado"
+    else:
+        status = "estável"
+
+# =========================
+# QUALIDADE DE EXECUÇÃO
+# =========================
+qualidade_execucao = "boa" if desvio_vel and desvio_vel < 0.5 else "irregular"
+
+# =========================
+# PERFIL DA SESSÃO
+# =========================
+perfil = "constante"
+
+if quebras > 15:
+    perfil = "irregular"
+elif drift is not None and drift < 0:
+    perfil = "progressivo"
+elif drift is not None and drift > 0.05:
+    perfil = "regressivo"
+
+# =========================
+# OUTPUT
 # =========================
 resultado = {
     "resumo": {
-        "tempo_s": tempo_total,
-        "distancia_m": dist_total,
-        "pace_medio_s_km": pace_medio,
-        "fc_media": media(hrs),
-        "fc_max": fc_max,
-        "vel_media": media(spds),
-        "cad_media": media(cads)
+        "dist_km": dist_km,
+        "tempo_s": tempo,
+        "fc_media": fc_media,
+        "eficiencia": eficiencia,
+        "desvio_vel": desvio_vel,
+        "pct_corrida": pct_corrida,
+        "recuperacao_fc": recuperacao_media,
+        "quebras": quebras,
+        "drift": drift,
+        "pico_eficiencia": pico_eficiencia
     },
-    "splits": splits,
-    "zonas_fc": zonas,
-    "serie_reduzida": serie_reduzida
+    "avaliacao": {
+        "score_0_10": score,
+        "status_fisiologico": status,
+        "qualidade_execucao": qualidade_execucao,
+        "perfil_sessao": perfil
+    },
+    "eficiencia_janelas": eficiencia_janelas,
+    "blocos": blocos
 }
 
-with open('atividade_processada.json', 'w', encoding='utf-8') as f:
+with open("atividade_v3_5.json", "w", encoding="utf-8") as f:
     json.dump(resultado, f, indent=2, ensure_ascii=False)
 
-print("🔥 JSON PROFISSIONAL NIVEL STRAVA GERADO!")
+print("🚀 V3.5 — ENGINE COMPLETA GERADA")
