@@ -1,0 +1,30 @@
+{
+    "data": "02/05/2026",
+    "sono": {
+        "horas": 7.55,
+        "qualidade": 82,
+        "bio_manha": 93,
+        "bio_noite": 53
+    },
+    "estado": {
+        "energia": 9,
+        "foco": 8,
+        "estresse": 4
+    },
+    "corpo": {
+        "cintura": null,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "De manh\u00e3, 2 ou 3 canecas de leite com caf\u00e9, 1 peda\u00e7o de bolo de chocolate. Almoço foi arroz, carne moida e ovo, sem lanche da tarde, o jantar foi lanche com batata frita. "
+    },
+    "treino": {
+        "planejado": "Descanso",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "remanejado": "n",
+        "justificativa": ""
+    },
+    "score": 414
+}

@@ -1,0 +1,59 @@
+{
+    "geral": {
+        "dias": 7,
+        "score_medio": 615.43,
+        "classificacao": "Boa"
+    },
+    "variacoes_vs_semana_anterior": {},
+    "corpo": {
+        "cintura_oficial_quarta": 77.0,
+        "peso_oficial_quarta": 64.05,
+        "cintura_media": 77.33,
+        "delta_cintura_real": -2.0
+    },
+    "habitos": {
+        "agua_litros_media": null,
+        "alcool_dias_uso": 0
+    },
+    "wearable": {
+        "passos_media": null,
+        "rhr_media": null,
+        "pai_media": null
+    },
+    "treino": {
+        "taxa_execucao": 50.0,
+        "completude_media": 98.33,
+        "intensidade_media": 6.67
+    },
+    "sono_estado": {
+        "horas_media": 7.96,
+        "qualidade_media": 76.14,
+        "energia_media": 7.57,
+        "foco_media": 7.43,
+        "estresse_medio": 6.43
+    },
+    "logs_narrativos": {
+        "alimentacao": [
+            "[Sábado - 02/05/2026]: De manhã, 2 ou 3 canecas de leite com café, 1 pedaço de bolo de chocolate. Almoço foi arroz, carne moida e ovo, sem lanche da tarde, o jantar foi lanche com batata frita. ",
+            "[Domingo - 03/05/2026]: 2 canecas de café com leite de manhã, arroz com linguiça e carne de porco assada no almoço com 2 copos de refri (coca e guaraná), 1 pedaço pequeno de bolo de leite ninho a tarde, sem jantar + 1 copo de sprite 0 apenas."
+        ],
+        "feeling_treino": [],
+        "contexto_obstaculos": []
+    },
+    "core": {
+        "dias": 4,
+        "score_medio": 702.5,
+        "taxa_execucao": 50.0,
+        "delta_cintura": -1.0
+    },
+    "extra": {
+        "dias": 3,
+        "score_medio": 499.33,
+        "taxa_execucao": 0,
+        "delta_cintura": -2.0
+    },
+    "diagnostico": [
+        "Final de semana está sabotando a semana",
+        "Baixa execução de treinos"
+    ]
+}

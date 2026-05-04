@@ -1,0 +1,30 @@
+{
+    "data": "03/05/2026",
+    "sono": {
+        "horas": 8.2,
+        "qualidade": 71,
+        "bio_manha": 94,
+        "bio_noite": 62
+    },
+    "estado": {
+        "energia": 7,
+        "foco": 6,
+        "estresse": 7
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "2 canecas de caf\u00e9 com leite de manh\u00e3, arroz com lingui\u00e7a e carne de porco assada no almo\u00e7o com 2 copos de refri (coca e guaran\u00e1), 1 peda\u00e7o pequeno de bolo de leite ninho a tarde, sem jantar + 1 copo de sprite 0 apenas."
+    },
+    "treino": {
+        "planejado": "Descanso",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "remanejado": "n",
+        "justificativa": ""
+    },
+    "score": 350
+}

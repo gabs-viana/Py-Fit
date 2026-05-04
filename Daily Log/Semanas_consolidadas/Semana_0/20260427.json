@@ -1,0 +1,33 @@
+{
+    "data": "27/04/2026",
+    "sono": {
+        "horas": 6.47,
+        "qualidade": 75,
+        "bio_manha": 92,
+        "bio_noite": 47
+    },
+    "estado": {
+        "energia": 10,
+        "foco": 10,
+        "estresse": 2
+    },
+    "corpo": {
+        "cintura": 78.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "cafe": "limpo",
+        "almoco": "limpo",
+        "lanche": "limpo",
+        "jantar": "limpo"
+    },
+    "treino": {
+        "planejado": "Upper",
+        "executado": "s",
+        "completude": 100,
+        "intensidade": 10,
+        "remanejado": "n",
+        "justificativa": ""
+    },
+    "score": 944
+}

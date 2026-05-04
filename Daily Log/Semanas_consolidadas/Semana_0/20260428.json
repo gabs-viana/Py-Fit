@@ -1,0 +1,33 @@
+{
+    "data": "28/04/2026",
+    "sono": {
+        "horas": 9.1,
+        "qualidade": 84,
+        "bio_manha": 94,
+        "bio_noite": 53
+    },
+    "estado": {
+        "energia": 9,
+        "foco": 9,
+        "estresse": 8
+    },
+    "corpo": {
+        "cintura": 78.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "cafe": "limpo",
+        "almoco": "limpo",
+        "lanche": "limpo",
+        "jantar": "limpo"
+    },
+    "treino": {
+        "planejado": "Corrida",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "remanejado": "s",
+        "justificativa": "Chuva interrompeu a corrida."
+    },
+    "score": 643
+}

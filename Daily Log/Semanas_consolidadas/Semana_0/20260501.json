@@ -1,0 +1,45 @@
+{
+    "data": "01/05/2026",
+    "sono": {
+        "horas": 10.95,
+        "qualidade": 71,
+        "bio_manha": 86,
+        "bio_noite": 50
+    },
+    "estado": {
+        "energia": 8,
+        "foco": 7,
+        "estresse": 9
+    },
+    "corpo": {
+        "cintura": 77.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "cafe": {
+            "descricao": "1 caneca de leite com caf\u00e9",
+            "tipo": "medio"
+        },
+        "almoco": {
+            "descricao": "Macarr\u00e3o ao molho branco",
+            "tipo": "medio"
+        },
+        "lanche": {
+            "descricao": "N\u00e3o",
+            "tipo": "ruim"
+        },
+        "jantar": {
+            "descricao": "Nada por enquanto",
+            "tipo": "ruim"
+        }
+    },
+    "treino": {
+        "planejado": "Corrida",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "remanejado": "n",
+        "justificativa": "Sem \u00e2nimo"
+    },
+    "score": 470
+}
