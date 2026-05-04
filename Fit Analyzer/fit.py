@@ -5,8 +5,12 @@ import shutil
 from datetime import datetime
 import statistics
 from fitparse import FitFile
+import urllib.request
+import urllib.error
 
 IDADE = 19
+PESO_KG = 64
+ALTURA_M = 1.65
 FC_MAX_TEO = 220 - IDADE
 CAD_CORRIDA = 75
 
@@ -18,6 +22,94 @@ MESES_PT = {
 
 def media(l):
     return sum(l) / len(l) if l else None
+
+def fetch_weather(lat, lon, dt):
+    """
+    Busca as condições climáticas na hora da corrida usando a Open-Meteo API.
+    """
+    if lat is None or lon is None or dt is None:
+        return None
+        
+    date_str = dt.strftime("%Y-%m-%d")
+    hour = dt.hour
+    
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&start_date={date_str}&end_date={date_str}&hourly=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m"
+    
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                if "hourly" in data:
+                    hourly = data["hourly"]
+                    times = hourly.get("time", [])
+                    target_time = f"{date_str}T{hour:02d}:00"
+                    
+                    try:
+                        idx = times.index(target_time)
+                        return {
+                            "temperatura_c": hourly["temperature_2m"][idx],
+                            "umidade_pct": hourly["relative_humidity_2m"][idx],
+                            "precipitacao_mm": hourly["precipitation"][idx],
+                            "vento_kmh": hourly["wind_speed_10m"][idx]
+                        }
+                    except ValueError:
+                        return None
+    except Exception as e:
+        print(f"  [Aviso] Não foi possível buscar o clima: {e}")
+        return None
+    return None
+
+def fetch_elevation_profile(lats, lons):
+    """ Busca altimetria de uma lista de coordenadas na Open-Meteo. """
+    if not lats or not lons or len(lats) != len(lons):
+        return None
+    lat_str = ",".join(f"{lat:.5f}" for lat in lats)
+    lon_str = ",".join(f"{lon:.5f}" for lon in lons)
+    url = f"https://api.open-meteo.com/v1/elevation?latitude={lat_str}&longitude={lon_str}"
+    
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                return data.get("elevation")
+    except Exception as e:
+        print(f"  [Aviso] Erro ao buscar elevação: {e}")
+    return None
+
+def classificar_treino(dist_km, tempo_s, blocos, fc_media, pct_corrida):
+    if pct_corrida is None or pct_corrida < 0.5:
+        return "caminhada"
+        
+    corridas = [b for b in blocos if b["tipo"] == "corrida"]
+    if len(corridas) > 5 and len(blocos) > 10:
+        return "intervalado/fartlek"
+        
+    if tempo_s > 3600 and dist_km > 10:
+        return "longão"
+        
+    if fc_media and fc_media > 155:
+        return "tempo run"
+        
+    if fc_media and fc_media < 135:
+        return "recovery run"
+        
+    return "corrida base"
+
+def estimar_sudorese(peso, tempo_s, temperatura, umidade, fc_media):
+    """ Estima a perda de líquidos em ml """
+    if not temperatura or not umidade or not tempo_s:
+        return None
+    
+    horas = tempo_s / 3600.0
+    taxa_base_ml = peso * 10 
+    fator_temp = max(0, (temperatura - 20) * 0.02)
+    fator_intensidade = (fc_media / 150.0) if fc_media else 1.0
+    fator_umidade = 1.0 + (umidade / 100.0 * 0.1)
+    
+    suor_total = (taxa_base_ml * fator_intensidade) * (1 + fator_temp) * fator_umidade * horas
+    return round(suor_total)
 
 def process_fit(filepath):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] Processando: {os.path.basename(filepath)}...")
@@ -32,18 +124,33 @@ def process_fit(filepath):
     # =========================
     # 1. EXTRAÇÃO OTIMIZADA
     # =========================
+    lat_start = None
+    lon_start = None
+
     # Lemos mantendo os objetos datetime nativos.
     for record in fitfile.get_messages('record'):
         row = {}
         for d in record:
             row[d.name] = d.value
         
+        if lat_start is None and row.get("position_lat") is not None and row.get("position_long") is not None:
+            lat_start = row.get("position_lat") * (180.0 / (2**31))
+            lon_start = row.get("position_long") * (180.0 / (2**31))
+
         if "timestamp" in row and row["timestamp"]:
+            lat = None
+            lon = None
+            if row.get("position_lat") is not None and row.get("position_long") is not None:
+                lat = row.get("position_lat") * (180.0 / (2**31))
+                lon = row.get("position_long") * (180.0 / (2**31))
+
             dados.append({
                 "t": row.get("timestamp"),
                 "hr": row.get("heart_rate"),
                 "cad": row.get("cadence"),
-                "spd": row.get("speed")
+                "spd": row.get("speed"),
+                "lat": lat,
+                "lon": lon
             })
 
     if not dados:
@@ -233,7 +340,57 @@ def process_fit(filepath):
     elif drift is not None and drift > 0.05: perfil = "regressivo"
 
     # =========================
-    # 5. GERAR RESULTADO
+    # 5. BIOMECÂNICA V5 (Altimetria, Power, GAP, Suor, Classificação)
+    # =========================
+    dt_clima = session_data.get('start_time') or dados[0]["t"]
+    clima = fetch_weather(lat_start, lon_start, dt_clima)
+
+    valid_gps = [d for d in dados if d["lat"] is not None and d["lon"] is not None]
+    
+    ganho_elevacao = 0
+    perda_elevacao = 0
+    inclinacao_media = 0
+    potencia_media_w = None
+    gap_vel_kmh = None
+
+    if valid_gps:
+        passo = max(1, len(valid_gps) // 50)
+        amostra_gps = valid_gps[::passo][:50]
+        lats = [g["lat"] for g in amostra_gps]
+        lons = [g["lon"] for g in amostra_gps]
+        
+        elevs = fetch_elevation_profile(lats, lons)
+        
+        if elevs and len(elevs) == len(amostra_gps):
+            for i in range(1, len(elevs)):
+                diff = elevs[i] - elevs[i-1]
+                if diff > 0:
+                    ganho_elevacao += diff
+                else:
+                    perda_elevacao += abs(diff)
+            
+            if dist > 0:
+                inclinacao_media = (ganho_elevacao - perda_elevacao) / dist * 100
+
+    if spd_media:
+        inclinacao_fator = inclinacao_media if inclinacao_media is not None else 0
+        ajuste = 1.0 + (inclinacao_fator * 0.03)
+        gap_vel_kmh = (spd_media * 3.6) * max(0.5, ajuste)
+        
+        custo = 4.0 + (inclinacao_fator * 0.5 if inclinacao_fator > 0 else inclinacao_fator * 0.2)
+        potencia_media_w = PESO_KG * spd_media * max(2.0, custo)
+
+    suor_ml = estimar_sudorese(
+        PESO_KG, tempo_total, 
+        clima["temperatura_c"] if clima else None,
+        clima["umidade_pct"] if clima else None,
+        fc_media
+    )
+
+    tipo_treino = classificar_treino(dist_km, tempo_total, blocos, fc_media, pct_corrida)
+
+    # =========================
+    # 6. GERAR RESULTADO
     # =========================
     resultado = {
         "resumo": {
@@ -250,13 +407,20 @@ def process_fit(filepath):
             "recuperacao_fc": round(recuperacao_media, 1) if recuperacao_media else None,
             "quebras": quebras,
             "drift_aerobico": round(drift, 4) if drift else None,
-            "pico_eficiencia": round(pico_eficiencia, 4) if pico_eficiencia else None
+            "pico_eficiencia": round(pico_eficiencia, 4) if pico_eficiencia else None,
+            "altimetria_ganho_m": round(ganho_elevacao, 1),
+            "altimetria_perda_m": round(perda_elevacao, 1),
+            "gap_vel_kmh": round(gap_vel_kmh, 2) if gap_vel_kmh else None,
+            "potencia_media_w": round(potencia_media_w, 1) if potencia_media_w else None,
+            "estimativa_suor_ml": suor_ml
         },
+        "clima": clima,
         "avaliacao": {
             "score_0_10": score,
             "status_fisiologico": status,
             "qualidade_execucao": qualidade_execucao,
-            "perfil_sessao": perfil
+            "perfil_sessao": perfil,
+            "tipo_treino_detectado": tipo_treino
         },
         "eficiencia_janelas": [round(e, 4) for e in eficiencia_janelas] if eficiencia_janelas else [],
         "blocos": []
@@ -296,7 +460,7 @@ def process_fit(filepath):
 
 if __name__ == "__main__":
     print("========================================")
-    print("🚀 Fit Analyzer V4.0 Iniciado")
+    print("🚀 Fit Analyzer V5.0 Iniciado")
     print("========================================\n")
     
     base_path = os.path.dirname(os.path.abspath(__file__))
