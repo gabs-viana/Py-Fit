@@ -1,0 +1,174 @@
+{
+  "resumo": {
+    "dist_km": 4.116,
+    "tempo_s": 2514.0,
+    "fc_media": 133,
+    "fc_max": 176,
+    "calorias": 363,
+    "training_effect": 2.3,
+    "anaerobic_te": 1.3,
+    "eficiencia_global": 0.0437,
+    "desvio_vel": 0.618,
+    "pct_corrida": 0.089,
+    "recuperacao_fc": -0.3,
+    "quebras": 15,
+    "drift_aerobico": 0.0912,
+    "pico_eficiencia": 0.072
+  },
+  "avaliacao": {
+    "score_0_10": 4,
+    "status_fisiologico": "fadiga alta",
+    "qualidade_execucao": "irregular",
+    "perfil_sessao": "irregular"
+  },
+  "eficiencia_janelas": [
+    0.0482,
+    0.0466,
+    0.0481,
+    0.0507,
+    0.0524,
+    0.0473,
+    0.0459,
+    0.0449,
+    0.0447,
+    0.045,
+    0.0451,
+    0.0526,
+    0.0385,
+    0.0411,
+    0.0633,
+    0.0381,
+    0.0398,
+    0.0581,
+    0.0341,
+    0.0356,
+    0.0621,
+    0.035,
+    0.0372,
+    0.0615,
+    0.035,
+    0.0335,
+    0.0367,
+    0.0374,
+    0.0391,
+    0.0382,
+    0.0355,
+    0.0409,
+    0.0404,
+    0.0569,
+    0.0389,
+    0.0397,
+    0.072,
+    0.0328,
+    0.0338,
+    0.033,
+    0.0382
+  ],
+  "blocos": [
+    {
+      "tipo": "caminhada",
+      "duracao_s": 671,
+      "fc_media": 110.8
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 46,
+      "fc_media": 144.6
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 147,
+      "fc_media": 135.7
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 42,
+      "fc_media": 149.8
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 124,
+      "fc_media": 142.4
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 44,
+      "fc_media": 158.8
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 135,
+      "fc_media": 145.9
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 16,
+      "fc_media": 151.3
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 1,
+      "fc_media": 165.0
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 2,
+      "fc_media": 165.5
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 1,
+      "fc_media": 166.0
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 6,
+      "fc_media": 166.5
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 1,
+      "fc_media": 168.0
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 1,
+      "fc_media": 168.0
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 1,
+      "fc_media": 168.0
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 17,
+      "fc_media": 170.5
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 158,
+      "fc_media": 146.9
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 39,
+      "fc_media": 169.1
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 547,
+      "fc_media": 135.8
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 21,
+      "fc_media": 147.5
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 495,
+      "fc_media": 139.1
+    }
+  ]
+}
