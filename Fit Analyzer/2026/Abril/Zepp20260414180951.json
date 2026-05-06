@@ -1,21 +1,37 @@
 {
   "resumo": {
-    "dist_km": 4.065,
+    "dist_km": 4.131,
     "tempo_s": 2738.0,
-    "fc_media": 125.1,
+    "fc_media": 125,
+    "fc_max": 177,
+    "calorias": 352,
+    "training_effect": 2.2,
+    "anaerobic_te": 0.8,
     "eficiencia_global": 0.043,
     "desvio_vel": 0.439,
     "pct_corrida": 0.115,
     "recuperacao_fc": 0.8,
     "quebras": 9,
     "drift_aerobico": 0.1473,
-    "pico_eficiencia": 0.0718
+    "pico_eficiencia": 0.0718,
+    "altimetria_ganho_m": 60.0,
+    "altimetria_perda_m": 52.0,
+    "gap_vel_kmh": 5.41,
+    "potencia_media_w": 391.5,
+    "estimativa_suor_ml": 479
+  },
+  "clima": {
+    "temperatura_c": 25.9,
+    "umidade_pct": 57,
+    "precipitacao_mm": 0.0,
+    "vento_kmh": 7.6
   },
   "avaliacao": {
     "score_0_10": 5,
     "status_fisiologico": "fadiga alta",
     "qualidade_execucao": "boa",
-    "perfil_sessao": "regressivo"
+    "perfil_sessao": "regressivo",
+    "tipo_treino_detectado": "caminhada"
   },
   "eficiencia_janelas": [
     0.0518,

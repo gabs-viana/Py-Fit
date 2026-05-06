@@ -128,7 +128,13 @@ def process_fit(filepath):
     lon_start = None
 
     # Lemos mantendo os objetos datetime nativos.
-    for record in fitfile.get_messages('record'):
+    try:
+        records = list(fitfile.get_messages('record'))
+    except Exception as e:
+        print(f"  [Erro] Arquivo corrompido ou vazio (falha da Amazfit/Zepp): {e}")
+        return
+
+    for record in records:
         row = {}
         for d in record:
             row[d.name] = d.value

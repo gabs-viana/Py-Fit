@@ -1,0 +1,41 @@
+{
+    "data": "05/05/2026",
+    "sono": {
+        "horas": 7.366666666666666,
+        "qualidade": 81,
+        "bio_manha": 94,
+        "bio_noite": 42
+    },
+    "estado": {
+        "energia": 8,
+        "foco": 8,
+        "estresse": 28
+    },
+    "habitos": {
+        "agua_litros": 4.5,
+        "alcool": "n"
+    },
+    "wearable": {
+        "passos": 8467,
+        "rhr": 51,
+        "pai": 30
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "de manh\u00e3, caf\u00e9 preto e somente isso, almo\u00e7o arroz, carne assada com cebola, batatas fritas e salada de alface e tomate; a tarde, 2 fatias de wickbolds roxos + 1 fatia de peito de peru + 1 fatia de mu\u00e7arela; a noite 3 copos de 180ml de Sprite 0 a\u00e7ucar, 1 prato com pouco arroz, bastante feij\u00e3o e carne moida com farinha temperada."
+    },
+    "treino": {
+        "planejado": "Corrida",
+        "executado": "s",
+        "completude": 100,
+        "intensidade": 10,
+        "remanejado": "n",
+        "justificativa": "",
+        "feeling": "Bem, me sai muito bem, experimentando corridas mais longas."
+    },
+    "contexto": "dia 100% ok",
+    "score": 919.0
+}

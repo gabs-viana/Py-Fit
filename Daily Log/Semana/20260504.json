@@ -1,0 +1,41 @@
+{
+    "data": "04/05/2026",
+    "sono": {
+        "horas": 6.3,
+        "qualidade": 69,
+        "bio_manha": 92,
+        "bio_noite": 57
+    },
+    "estado": {
+        "energia": 9,
+        "foco": 9,
+        "estresse": 29
+    },
+    "habitos": {
+        "agua_litros": 5.0,
+        "alcool": "n"
+    },
+    "wearable": {
+        "passos": 5283,
+        "rhr": 55,
+        "pai": 6
+    },
+    "corpo": {
+        "cintura": null,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "de caf\u00e9 da manh\u00e3, quebrei o jejum com 200ml de leite integral + whey Growth cookies and Cream (1 dose), seguido de caf\u00e9 preto puro, muita hidrata\u00e7\u00e3o matinal, almo\u00e7o refor\u00e7ado com carne assada acebolada, arroz, salada de alface e tomate, batatas fritas, salzinho e vinagre de alcool.a tarde, 2 fatias de wickbold roxo + 1 fatia de peito de peru + 2 fatias de queijo mu\u00e7arela. A noite foi mais fraco, 1 peda\u00e7o pequeno de bolo de chocolate, 1 caneca de leite com nescau e 2 fatias de pao wickbold roxo + 1 fatia de presunto + 1 fatia de mu\u00e7arela."
+    },
+    "treino": {
+        "planejado": "Upper",
+        "executado": "s",
+        "completude": 100,
+        "intensidade": 10,
+        "remanejado": "n",
+        "justificativa": "",
+        "feeling": "Bem, \u00f3timo ativador do meu dia, ap\u00f3s o treino me senti preparado para enfrentar o resto."
+    },
+    "contexto": "Recome\u00e7o com intensidade",
+    "score": 882.5
+}

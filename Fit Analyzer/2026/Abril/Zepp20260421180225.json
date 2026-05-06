@@ -13,13 +13,25 @@
     "recuperacao_fc": -0.3,
     "quebras": 15,
     "drift_aerobico": 0.0912,
-    "pico_eficiencia": 0.072
+    "pico_eficiencia": 0.072,
+    "altimetria_ganho_m": 58.0,
+    "altimetria_perda_m": 50.0,
+    "gap_vel_kmh": 5.85,
+    "potencia_media_w": 423.8,
+    "estimativa_suor_ml": 461
+  },
+  "clima": {
+    "temperatura_c": 25.2,
+    "umidade_pct": 53,
+    "precipitacao_mm": 0.0,
+    "vento_kmh": 3.6
   },
   "avaliacao": {
     "score_0_10": 4,
     "status_fisiologico": "fadiga alta",
     "qualidade_execucao": "irregular",
-    "perfil_sessao": "irregular"
+    "perfil_sessao": "irregular",
+    "tipo_treino_detectado": "caminhada"
   },
   "eficiencia_janelas": [
     0.0482,
