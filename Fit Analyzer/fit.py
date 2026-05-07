@@ -23,6 +23,18 @@ MESES_PT = {
 def media(l):
     return sum(l) / len(l) if l else None
 
+def vel_to_pace_str(speed_ms):
+    if not speed_ms or speed_ms <= 0: return None
+    pace_min = (1000 / speed_ms) / 60
+    m = int(pace_min)
+    s = int((pace_min - m) * 60)
+    return f"{m}:{s:02d}"
+
+def vel_kmh_to_pace_str(speed_kmh):
+    if not speed_kmh or speed_kmh <= 0: return None
+    speed_ms = speed_kmh / 3.6
+    return vel_to_pace_str(speed_ms)
+
 def fetch_weather(lat, lon, dt):
     """
     Busca as condições climáticas na hora da corrida usando a Open-Meteo API.
@@ -396,12 +408,84 @@ def process_fit(filepath):
     tipo_treino = classificar_treino(dist_km, tempo_total, blocos, fc_media, pct_corrida)
 
     # =========================
+    # 5.1 FISIOLOGIA V6 (GPT ABSURDO ABSOLUTO)
+    # =========================
+    # 1. Dominância Simpática
+    dominancia_simpatica = "indefinido"
+    if recuperacao_media is not None and drift is not None:
+        if recuperacao_media < 15 and drift > 0.05:
+            dominancia_simpatica = "vermelho (sistema saturando)"
+        elif recuperacao_media > 25 and drift < 0.03:
+            dominancia_simpatica = "verde (recuperado)"
+        else:
+            dominancia_simpatica = "amarelo (alerta)"
+
+    # 2. Pacing Emocional (Falha de Pacing)
+    pacing_emocional = False
+    if tempo_total > 600 and len(dados) > 100:
+        idx_15 = int(len(dados) * 0.15)
+        b_ini = dados[:idx_15]
+        b_rest = dados[idx_15:]
+        spd_i = media([d["spd"] for d in b_ini if d["spd"] is not None])
+        spd_r = media([d["spd"] for d in b_rest if d["spd"] is not None])
+        hr_i = [d["hr"] for d in b_ini if d["hr"] is not None]
+        if spd_i and spd_r and hr_i:
+            hr_climb = max(hr_i) - min(hr_i[:10]) if len(hr_i) > 10 else 0
+            if spd_i > (spd_r * 1.05) and hr_climb > 30:
+                pacing_emocional = True
+
+    # 3. Fluxo Útil Contínuo (Continuidade Metabólica)
+    max_fluxo_s = 0
+    fluxo_atual_s = 0
+    fc_janela = []
+    for d in dados:
+        if d["cad"] and d["cad"] >= CAD_CORRIDA and d["hr"]:
+            fc_janela.append(d["hr"])
+            fluxo_atual_s += 1
+            if len(fc_janela) > 30:
+                if (max(fc_janela) - min(fc_janela)) > (media(fc_janela) * 0.10):
+                    if fluxo_atual_s > max_fluxo_s: max_fluxo_s = fluxo_atual_s
+                    fluxo_atual_s = 0
+                    fc_janela = []
+        else:
+            if fluxo_atual_s > max_fluxo_s: max_fluxo_s = fluxo_atual_s
+            fluxo_atual_s = 0
+            fc_janela = []
+    if fluxo_atual_s > max_fluxo_s: max_fluxo_s = fluxo_atual_s
+    tempo_fluxo_util_min = round(max_fluxo_s / 60, 1)
+
+    # 4. Identidade dos Blocos
+    for b in blocos:
+        if b["tipo"] == "caminhada":
+            b["identidade"] = "recuperação falsa" if (b["fc_media"] and b["fc_media"] > 145) else "recuperação"
+        else:
+            if b["duracao_s"] < 120 and b["fc_media"] and b["fc_media"] > 165:
+                b["identidade"] = "aceleração prematura"
+            elif b["fc_media"] and b["fc_media"] < 145:
+                b["identidade"] = "aquecimento eficiente"
+            else:
+                b["identidade"] = "bloco produtivo"
+
+    # 5. Previsão de Colapso
+    previsao_colapso_min = None
+    if drift and drift > 0 and len(blocos) > 0:
+        ult_bloco_corrida = [b for b in blocos if b["tipo"] == "corrida"]
+        if ult_bloco_corrida:
+            fc_final = ult_bloco_corrida[-1]["fc_media"]
+            if fc_final and fc_final > 150:
+                fc_climb_per_min = (fc_final * drift) / (tempo_total / 60) if tempo_total > 0 else 0
+                fc_restante = FC_MAX_TEO - fc_final
+                if fc_climb_per_min > 0 and fc_restante > 0:
+                    previsao_colapso_min = round(fc_restante / fc_climb_per_min, 1)
+
+    # =========================
     # 6. GERAR RESULTADO
     # =========================
     resultado = {
         "resumo": {
             "dist_km": round(dist_km, 3) if dist_km else 0,
             "tempo_s": round(tempo_total, 1),
+            "pace_medio": vel_to_pace_str(spd_media),
             "fc_media": round(fc_media, 1) if fc_media else None,
             "fc_max": session_data.get('max_heart_rate'),
             "calorias": session_data.get('total_calories'),
@@ -417,8 +501,15 @@ def process_fit(filepath):
             "altimetria_ganho_m": round(ganho_elevacao, 1),
             "altimetria_perda_m": round(perda_elevacao, 1),
             "gap_vel_kmh": round(gap_vel_kmh, 2) if gap_vel_kmh else None,
+            "gap_pace": vel_kmh_to_pace_str(gap_vel_kmh) if gap_vel_kmh else None,
             "potencia_media_w": round(potencia_media_w, 1) if potencia_media_w else None,
             "estimativa_suor_ml": suor_ml
+        },
+        "v6_elite": {
+            "dominancia_simpatica": dominancia_simpatica,
+            "pacing_emocional_detectado": pacing_emocional,
+            "tempo_fluxo_util_min": tempo_fluxo_util_min,
+            "previsao_colapso_min": previsao_colapso_min
         },
         "clima": clima,
         "avaliacao": {
@@ -466,7 +557,7 @@ def process_fit(filepath):
 
 if __name__ == "__main__":
     print("========================================")
-    print("🚀 Fit Analyzer V5.0 Iniciado")
+    print("🚀 Fit Analyzer V6.0 Iniciado (Elite Edition)")
     print("========================================\n")
     
     base_path = os.path.dirname(os.path.abspath(__file__))

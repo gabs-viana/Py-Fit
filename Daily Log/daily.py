@@ -107,6 +107,52 @@ def score_estado(energia, foco, estresse):
     return min(250, pts)
 
 # =========================
+# READINESS INDEX V6
+# =========================
+# Pesos: HRV 45%, RHR 25%, Sono Profundo 20%, Estresse 10%
+RHR_REF = 55  # Sua baseline pessoal de RHR
+
+def calcular_readiness(hrv, rhr, sono_profundo_min, sono_total_min, estresse):
+    """
+    Calcula Readiness Index (0-100) baseado em sinais vitais do Bip 6.
+    Retorna None se não houver HRV disponível.
+    """
+    if hrv is None:
+        return None
+    
+    # HRV Score (45%) — Baseline ~40ms, excelente ~80ms+
+    hrv_score = min(100, max(0, (hrv / 80) * 100))
+    
+    # RHR Score (25%) — Quanto mais baixo vs. referência, melhor
+    if rhr is not None:
+        rhr_delta = RHR_REF - rhr  # positivo = abaixo da ref = bom
+        rhr_score = min(100, max(0, 70 + (rhr_delta * 5)))
+    else:
+        rhr_score = 50  # neutro
+    
+    # Sono Profundo Score (20%) — Ideal: >20% do tempo total
+    if sono_profundo_min is not None and sono_total_min and sono_total_min > 0:
+        pct_profundo = (sono_profundo_min / sono_total_min) * 100
+        profundo_score = min(100, max(0, pct_profundo * 5))  # 20% = 100
+    else:
+        profundo_score = 50  # neutro
+    
+    # Estresse Score (10%) — Quanto menor, melhor
+    if estresse is not None:
+        stress_score = max(0, 100 - estresse)
+    else:
+        stress_score = 50  # neutro
+    
+    readiness = (
+        hrv_score * 0.45 +
+        rhr_score * 0.25 +
+        profundo_score * 0.20 +
+        stress_score * 0.10
+    )
+    
+    return round(readiness, 1)
+
+# =========================
 # FEEDBACK
 # =========================
 def feedback(score):
@@ -237,30 +283,39 @@ def main():
     print(f"\n=== LOG ATLETA — {data_ref.strftime('%d/%m/%Y')} ===\n")
 
     # ===== SONO =====
+    print("\n--- 💤 SONO ---")
     horas = input_horas("Horas de sono: ")
     qualidade = input_int("Qualidade (0-100): ", 0, 100)
     bio_manha = input_int("Biocharge manhã (0-100): ", 0, 100)
     bio_noite = input_int("Biocharge noite (0-100): ", 0, 100)
+    sono_rem = input_int("Sono REM (min) [Enter para pular]: ", min_val=0, opcional=True)
+    sono_profundo = input_int("Sono Profundo (min) [Enter para pular]: ", min_val=0, opcional=True)
+    sono_leve = input_int("Sono Leve (min) [Enter para pular]: ", min_val=0, opcional=True)
 
     # ===== ESTADO =====
+    print("\n--- ⚡ ESTADO ---")
     energia = input_int("Energia (0-10): ", 0, 10)
     foco = input_int("Foco (0-10): ", 0, 10)
-    estresse = input_int("Estresse (0-100): ", 0, 100)
+    estresse = input_int("Estresse médio do dia (0-100): ", 0, 100)
 
     # ===== CORPO =====
+    print("\n--- 📐 CORPO ---")
     cintura = input_float("Cintura (cm) [Enter para pular]: ", opcional=True)
     peso = None
     if dia_semana == 2:
         peso = input_float("Peso (kg) [Enter para pular]: ", opcional=True)
 
     # ===== HÁBITOS =====
+    print("\n--- 💧 HÁBITOS ---")
     agua = input_float("Água (Litros): ")
-    alcool = input_sn("Consumiu álcool? (s/n): ")
 
-    # ===== WEARABLE (Bip 6) =====
+    # ===== WEARABLE (Amazfit Bip 6 — BioTracker 6.0) =====
+    print("\n--- ⌚ WEARABLE (Bip 6) ---")
     passos = input_int("Passos: ")
     rhr = input_int("RHR (Batimentos em repouso): ")
     pai = input_int("PAI (Ganho no dia) [Enter para pular]: ", min_val=0, opcional=True)
+    hrv = input_int("HRV (ms) [Enter para pular]: ", min_val=0, opcional=True)
+    calorias_ativas = input_int("Calorias Ativas [Enter para pular]: ", min_val=0, opcional=True)
 
     # ===== ALIMENTAÇÃO =====
     print("\nAlimentação do dia:")
@@ -364,14 +419,25 @@ def main():
     s_estado = score_estado(energia, foco, estresse)
 
     if planejado == "Descanso":
-        # Se é descanso, o treino não entra na conta (max 600 base -> vira 1000)
         score_base = s_sono + s_estado
         score_total = int((score_base / 600) * 1000)
     else:
         score_total = s_sono + s_treino + s_estado
 
+    # ===== READINESS INDEX V6 =====
+    sono_total_min = int(horas * 60) if horas else None
+    readiness = calcular_readiness(hrv, rhr, sono_profundo, sono_total_min, estresse)
+
     print(f"\n📊 Score do dia: {score_total}/1000")
     print(feedback(score_total))
+    if readiness is not None:
+        if readiness >= 75:
+            r_label = "🟢 PRONTO"
+        elif readiness >= 50:
+            r_label = "🟡 ALERTA"
+        else:
+            r_label = "🔴 RECUPERAR"
+        print(f"🧬 Readiness Index: {readiness}/100 — {r_label}")
 
     registro = {
         "data": data_ref.strftime("%d/%m/%Y"),
@@ -379,7 +445,10 @@ def main():
             "horas": horas,
             "qualidade": qualidade,
             "bio_manha": bio_manha,
-            "bio_noite": bio_noite
+            "bio_noite": bio_noite,
+            "rem_min": sono_rem,
+            "profundo_min": sono_profundo,
+            "leve_min": sono_leve
         },
         "estado": {
             "energia": energia,
@@ -387,13 +456,14 @@ def main():
             "estresse": estresse
         },
         "habitos": {
-            "agua_litros": agua,
-            "alcool": alcool
+            "agua_litros": agua
         },
         "wearable": {
             "passos": passos,
             "rhr": rhr,
-            "pai": pai
+            "pai": pai,
+            "hrv_ms": hrv,
+            "calorias_ativas": calorias_ativas
         },
         "corpo": {
             "cintura": cintura,
@@ -412,7 +482,8 @@ def main():
             "feeling": feeling_treino
         },
         "contexto": obstaculo_dia,
-        "score": score_total
+        "score": score_total,
+        "readiness": readiness
     }
 
     salvar_dia(registro, data_ref)

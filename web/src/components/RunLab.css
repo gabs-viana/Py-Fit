@@ -1,0 +1,80 @@
+/* web/src/components/RunLab.css */
+.runs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+
+.run-card {
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.run-card:hover {
+  border-color: rgba(255,255,255,0.15);
+  background: var(--bg-card-hover);
+}
+
+.run-card-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 0.5rem;
+}
+
+.run-date {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.run-type {
+  font-weight: bold;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.run-stats-main {
+  display: flex;
+  justify-content: space-between;
+}
+
+.run-stats-main > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.stat-value small {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  margin-left: 2px;
+}
+
+.run-v6-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.v6-badge {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid;
+  font-weight: 600;
+  background: rgba(255,255,255,0.02);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

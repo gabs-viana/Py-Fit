@@ -1,0 +1,41 @@
+{
+    "data": "06/05/2026",
+    "sono": {
+        "horas": 6.583333333333333,
+        "qualidade": 72,
+        "bio_manha": 90,
+        "bio_noite": 40
+    },
+    "estado": {
+        "energia": 9,
+        "foco": 7,
+        "estresse": 36
+    },
+    "habitos": {
+        "agua_litros": 5.5,
+        "alcool": "n"
+    },
+    "wearable": {
+        "passos": 5291,
+        "rhr": 56,
+        "pai": 8
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": 64.8
+    },
+    "alimentacao": {
+        "descricao": "De manh\u00e3, caf\u00e9zinho preto de lei + whey da nMax titanium Buenissimo (1 dose). Almoço com 200g de frango grelhado + arroz cremoso com creme de abóbora (200g) 4 balas, 2 de iogurte, 2 de banana Oliveira. Jantar foi um pouco de arroz, bastante feijão, carne moída e um pouco de carne de porco frita."
+    },
+    "treino": {
+        "planejado": "Lower",
+        "executado": "s",
+        "completude": 100,
+        "intensidade": 10,
+        "remanejado": "n",
+        "justificativa": "",
+        "feeling": "Muito bem"
+    },
+    "contexto": "",
+    "score": 861.0
+}
