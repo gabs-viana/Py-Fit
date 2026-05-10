@@ -2,17 +2,21 @@
 
 Documento de planejamento para a evolução do motor de performance.
 
-## 📈 Refinamento Biométrico
-- [ ] **RHR (Resting Heart Rate)**: Ajustar o cálculo para eliminar o gap (atual -3 vs real). Investigar o endpoint `heartRate` bruto vs o valor reportado pelo PAI.
-- [ ] **PAI (Gain do Dia)**: Exibir o ganho de PAI específico do dia no prompt e no JSON final.
-- [ ] **VFC (HRV)**: Implementar a captura do RMSSD/HRV do endpoint `/v2/users/me/events` para alimentar o Readiness Index com dados reais em vez de placeholders.
+## ✅ Conquistas Recentes (10/05/2026) - INTEGRAÇÃO TOTAL ZEPP
+- [x] **Bypass Zepp Cloud**: Quebra de Root Detection e SSL Pinning via Frida/Nox.
+- [x] **Consolidação do Readiness Index**: Algoritmo `Py-Fit Score` (HRV + Sono + Carga). ✅
+- [x] **Nova UI/UX (Review Screen)**: Refatoração do `daily.py` para revisão por ID. ✅
+- [x] **Nutrição Automatizada**: Macros (P/C/G/F) e logs de texto (`foodText`) integrados.
+- [x] **Peso (64.8kg)**: Endpoint `weightRecords` domado com trava de data.
+- [x] **Biocharge & Estresse**: Sincronização perfeita via blindagem de fuso horário (+/- 12h).
+- [x] **RHR & PAI**: Extração de sumário diário com delta de ganho de PAI.
+- [x] **Sleep Score & Insights**: Captura total de score e textos motivacionais da Zepp.
 
-## 🛌 Performance de Sono
-- [ ] **Biocharge**: Integrar os níveis de Biocharge (ao acordar e ao deitar) capturados via `insight_data`.
-- [ ] **Sleep Score**: Substituir a entrada manual de "Qualidade" pela pontuação nativa da Zepp Cloud (`ss` ou `sleepScore`).
-
-## 🍎 Nível 2: Nutrição & Contexto
-- [ ] **Ingestão de Refeições**: Explorar a extração de dados nutricionais e descritivos diretamente da Zepp Cloud, integrando ao campo `alimentacao`.
+## 📈 Próximos Alvos: Soberania & Predição (V8)
+- [ ] **Provider Adapter Layer**: Desacoplar a Zepp e criar suporte para Garmin/Apple/HealthConnect.
+- [ ] **Confidence Scoring**: Implementar níveis de confiança por fonte de dados.
+- [ ] **Adaptive Weighting**: Algoritmo que ajusta os pesos do Py-Fit Score com base na performance real.
+- [ ] **Performance Forecasting**: Motor preditivo de Supercompensação e Risco de Fadiga.
 
 ---
-*Retomaremos em: 10/05/2026*
+*Status: Infraestrutura Modular Longitudinal 100% Operacional. Próximo alvo: Soberania de Dados e Predição.*

@@ -1,0 +1,512 @@
+{
+  "v": "6",
+  "goal": 8000,
+  "tz": "-10800",
+  "algv": "2.13.14",
+  "sn": "24357515250306",
+  "slp": {
+    "stage": [
+      {
+        "start": 1395,
+        "stop": 1399,
+        "mode": 4
+      },
+      {
+        "start": 1400,
+        "stop": 1402,
+        "mode": 7
+      },
+      {
+        "start": 1403,
+        "stop": 1409,
+        "mode": 4
+      },
+      {
+        "start": 1410,
+        "stop": 1432,
+        "mode": 5
+      },
+      {
+        "start": 1433,
+        "stop": 1446,
+        "mode": 4
+      },
+      {
+        "start": 1447,
+        "stop": 1447,
+        "mode": 7
+      },
+      {
+        "start": 1448,
+        "stop": 1460,
+        "mode": 4
+      },
+      {
+        "start": 1461,
+        "stop": 1465,
+        "mode": 8
+      },
+      {
+        "start": 1466,
+        "stop": 1492,
+        "mode": 4
+      },
+      {
+        "start": 1493,
+        "stop": 1506,
+        "mode": 5
+      },
+      {
+        "start": 1507,
+        "stop": 1510,
+        "mode": 4
+      },
+      {
+        "start": 1511,
+        "stop": 1523,
+        "mode": 5
+      },
+      {
+        "start": 1524,
+        "stop": 1536,
+        "mode": 4
+      },
+      {
+        "start": 1537,
+        "stop": 1578,
+        "mode": 8
+      },
+      {
+        "start": 1579,
+        "stop": 1602,
+        "mode": 4
+      },
+      {
+        "start": 1603,
+        "stop": 1607,
+        "mode": 5
+      },
+      {
+        "start": 1608,
+        "stop": 1617,
+        "mode": 4
+      },
+      {
+        "start": 1618,
+        "stop": 1626,
+        "mode": 5
+      },
+      {
+        "start": 1627,
+        "stop": 1637,
+        "mode": 4
+      },
+      {
+        "start": 1638,
+        "stop": 1643,
+        "mode": 8
+      },
+      {
+        "start": 1644,
+        "stop": 1646,
+        "mode": 4
+      },
+      {
+        "start": 1647,
+        "stop": 1647,
+        "mode": 7
+      },
+      {
+        "start": 1648,
+        "stop": 1650,
+        "mode": 4
+      },
+      {
+        "start": 1651,
+        "stop": 1678,
+        "mode": 8
+      },
+      {
+        "start": 1679,
+        "stop": 1714,
+        "mode": 4
+      },
+      {
+        "start": 1715,
+        "stop": 1717,
+        "mode": 5
+      },
+      {
+        "start": 1718,
+        "stop": 1723,
+        "mode": 4
+      },
+      {
+        "start": 1724,
+        "stop": 1724,
+        "mode": 7
+      },
+      {
+        "start": 1725,
+        "stop": 1743,
+        "mode": 4
+      },
+      {
+        "start": 1744,
+        "stop": 1757,
+        "mode": 8
+      },
+      {
+        "start": 1758,
+        "stop": 1767,
+        "mode": 4
+      },
+      {
+        "start": 1768,
+        "stop": 1770,
+        "mode": 8
+      },
+      {
+        "start": 1771,
+        "stop": 1841,
+        "mode": 4
+      },
+      {
+        "start": 1842,
+        "stop": 1842,
+        "mode": 7
+      },
+      {
+        "start": 1843,
+        "stop": 1845,
+        "mode": 4
+      },
+      {
+        "start": 1846,
+        "stop": 1858,
+        "mode": 8
+      },
+      {
+        "start": 1859,
+        "stop": 1861,
+        "mode": 4
+      },
+      {
+        "start": 1862,
+        "stop": 1862,
+        "mode": 7
+      },
+      {
+        "start": 1863,
+        "stop": 1870,
+        "mode": 4
+      },
+      {
+        "start": 1871,
+        "stop": 1871,
+        "mode": 7
+      },
+      {
+        "start": 1872,
+        "stop": 1895,
+        "mode": 4
+      }
+    ],
+    "odd_stage": [],
+    "spos": 0,
+    "spol": 0,
+    "spor": 0,
+    "spob": 0,
+    "st": 1778292900,
+    "ed": 1778322960,
+    "obt": -71,
+    "ebt": 465,
+    "dp": 67,
+    "lt": 314,
+    "wk": 9,
+    "wc": 7,
+    "supNap": true,
+    "supRem": true,
+    "is": 26,
+    "lb": 9,
+    "dt": 111,
+    "rhr": 57,
+    "ss": 87,
+    "to": 0,
+    "sleepSource": 10158337,
+    "sleepScoreVersion": "1.0.1",
+    "sleepVersion": 0,
+    "napVersion": 0,
+    "sleepAlgoVersion": "4.0.11"
+  },
+  "stp": {
+    "ttl": 1204,
+    "dis": 834,
+    "cal": 73,
+    "wk": 9,
+    "rn": 24,
+    "runDist": 323,
+    "runCal": 34,
+    "stage": [
+      {
+        "start": 505,
+        "stop": 517,
+        "mode": 1,
+        "dis": 95,
+        "cal": 7,
+        "step": 153
+      },
+      {
+        "start": 989,
+        "stop": 1003,
+        "mode": 7,
+        "dis": 69,
+        "cal": 6,
+        "step": 111
+      }
+    ],
+    "stepStageSummary": [
+      {
+        "time": 9,
+        "count": 1,
+        "dis": 6,
+        "cal": 1,
+        "step": 9
+      },
+      {
+        "time": 25,
+        "count": 1,
+        "dis": 4,
+        "cal": 0,
+        "step": 6
+      },
+      {
+        "time": 26,
+        "count": 0,
+        "dis": 0,
+        "cal": 1,
+        "step": 0
+      },
+      {
+        "time": 46,
+        "count": 1,
+        "dis": 59,
+        "cal": 3,
+        "step": 94
+      },
+      {
+        "time": 47,
+        "count": 1,
+        "dis": 6,
+        "cal": 1,
+        "step": 10
+      },
+      {
+        "time": 50,
+        "count": 1,
+        "dis": 59,
+        "cal": 4,
+        "step": 95
+      },
+      {
+        "time": 51,
+        "count": 1,
+        "dis": 47,
+        "cal": 5,
+        "step": 75
+      },
+      {
+        "time": 57,
+        "count": 1,
+        "dis": 4,
+        "cal": 1,
+        "step": 6
+      },
+      {
+        "time": 59,
+        "count": 1,
+        "dis": 35,
+        "cal": 4,
+        "step": 56
+      },
+      {
+        "time": 60,
+        "count": 1,
+        "dis": 7,
+        "cal": 2,
+        "step": 12
+      },
+      {
+        "time": 70,
+        "count": 1,
+        "dis": 23,
+        "cal": 2,
+        "step": 37
+      },
+      {
+        "time": 71,
+        "count": 1,
+        "dis": 6,
+        "cal": 1,
+        "step": 9
+      },
+      {
+        "time": 72,
+        "count": 2,
+        "dis": 94,
+        "cal": 6,
+        "step": 151
+      },
+      {
+        "time": 73,
+        "count": 1,
+        "dis": 6,
+        "cal": 2,
+        "step": 9
+      },
+      {
+        "time": 74,
+        "count": 1,
+        "dis": 27,
+        "cal": 4,
+        "step": 43
+      },
+      {
+        "time": 75,
+        "count": 1,
+        "dis": 3,
+        "cal": 1,
+        "step": 5
+      },
+      {
+        "time": 77,
+        "count": 1,
+        "dis": 11,
+        "cal": 3,
+        "step": 18
+      },
+      {
+        "time": 79,
+        "count": 1,
+        "dis": 11,
+        "cal": 2,
+        "step": 17
+      },
+      {
+        "time": 86,
+        "count": 1,
+        "dis": 11,
+        "cal": 1,
+        "step": 17
+      },
+      {
+        "time": 87,
+        "count": 1,
+        "dis": 13,
+        "cal": 2,
+        "step": 21
+      },
+      {
+        "time": 90,
+        "count": 1,
+        "dis": 5,
+        "cal": 1,
+        "step": 8
+      },
+      {
+        "time": 92,
+        "count": 1,
+        "dis": 82,
+        "cal": 5,
+        "step": 131
+      },
+      {
+        "time": 93,
+        "count": 1,
+        "dis": 12,
+        "cal": 2,
+        "step": 20
+      },
+      {
+        "time": 98,
+        "count": 1,
+        "dis": 17,
+        "cal": 1,
+        "step": 28
+      },
+      {
+        "time": 99,
+        "count": 1,
+        "dis": 42,
+        "cal": 4,
+        "step": 67
+      },
+      {
+        "time": 100,
+        "count": 1,
+        "dis": 22,
+        "cal": 3,
+        "step": 35
+      },
+      {
+        "time": 105,
+        "count": 1,
+        "dis": 37,
+        "cal": 1,
+        "step": 59
+      },
+      {
+        "time": 106,
+        "count": 0,
+        "dis": 0,
+        "cal": 1,
+        "step": 0
+      },
+      {
+        "time": 118,
+        "count": 1,
+        "dis": 19,
+        "cal": 1,
+        "step": 30
+      },
+      {
+        "time": 119,
+        "count": 1,
+        "dis": 15,
+        "cal": 1,
+        "step": 24
+      },
+      {
+        "time": 124,
+        "count": 1,
+        "dis": 24,
+        "cal": 3,
+        "step": 39
+      },
+      {
+        "time": 126,
+        "count": 1,
+        "dis": 4,
+        "cal": 0,
+        "step": 7
+      },
+      {
+        "time": 127,
+        "count": 1,
+        "dis": 18,
+        "cal": 1,
+        "step": 29
+      },
+      {
+        "time": 128,
+        "count": 1,
+        "dis": 23,
+        "cal": 3,
+        "step": 37
+      }
+    ]
+  },
+  "isMerged": 0,
+  "byteLength": 8,
+  "sync": 1778412588
+}

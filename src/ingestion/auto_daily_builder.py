@@ -2,9 +2,14 @@ import json
 import os
 import sys
 from datetime import datetime
+
+# Ajuste de path para achar os módulos internos
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from normalize import TakeoutNormalizer
 from zepp_normalize import ZeppNormalizer
 from zepp_api import ZeppAPI
+from analysis.longitudinal_engine import LongitudinalEngine
 
 def find_zepp_folder(base_dir):
     """Finds a folder that looks like a Zepp export."""
@@ -42,6 +47,21 @@ def build_prefill(date_str=None):
             data = api.normalize_for_daily(date_str)
             if data and data.get("sleep"):
                 print("✅ SUCCESS: Data retrieved directly from Zepp Cloud.")
+                
+                # Inteligência Longitudinal
+                try:
+                    engine = LongitudinalEngine(api)
+                    baselines, _ = engine.get_historical_baselines(date_str, days=30)
+                    trends = engine.analyze_trends(data, baselines)
+                    signatures = engine.detect_fatigue_signature(trends)
+                    
+                    data["longitudinal"] = {
+                        "baselines_30d": baselines,
+                        "trends": trends,
+                        "fatigue_signatures": signatures
+                    }
+                except Exception as e:
+                    print(f"⚠️ Erro ao processar tendências: {e}")
             else:
                 print("⚠️ Zepp Cloud returned incomplete data. Falling back...")
                 data = None
@@ -73,24 +93,39 @@ def build_prefill(date_str=None):
 
     if data:
         # Mapeamento para o Schema do daily.py
+        # Consolidação Final
+        biometrics = data.get("biometrics", {})
         prefill_data = {
             "date": date_str,
+            "readiness_index": data.get("readiness_index"),
             "sleep": {
                 "total_hours": data["sleep"].get("total_hours"),
                 "rem_sleep_pct": data["sleep"].get("rem_sleep_pct"),
                 "deep_sleep_pct": data["sleep"].get("deep_sleep_pct"),
-                "light_sleep_pct": data["sleep"].get("light_sleep_pct")
+                "light_sleep_pct": data["sleep"].get("light_sleep_pct"),
+                "score": data["sleep"].get("score"),
+                "insight": data["sleep"].get("insight")
             },
+            "nutrition": data.get("nutrition", {}),
             "biometrics": {
-                "steps": data.get("steps"),
-                "rhr": data.get("rhr"),
-                "calories": data.get("calories"),
-                "stress": data.get("stress"),
-                "pai": data.get("pai"),
-                "spo2": data.get("spo2"),
-                "sport_load": data.get("sport_load")
+                "steps": biometrics.get("steps"),
+                "weight": biometrics.get("weight"),
+                "bmi": biometrics.get("bmi"),
+                "rhr": biometrics.get("rhr"),
+                "hrv": biometrics.get("hrv"),
+                "readiness": biometrics.get("readiness"),
+                "biocharge_waking": biometrics.get("biocharge_waking"),
+                "biocharge_current": biometrics.get("biocharge_current"),
+                "calories": biometrics.get("calories"),
+                "stress": biometrics.get("stress"),
+                "pai": biometrics.get("pai"),
+                "pai_gain": biometrics.get("pai_gain"),
+                "workout_detected": biometrics.get("workout_detected"),
+                "workout_info": biometrics.get("workout_info"),
+                "sport_load": biometrics.get("sport_load")
             },
-            "api_source": data.get("api_source")
+            "api_source": data.get("api_source"),
+            "longitudinal": data.get("longitudinal")
         }
 
         with open(output_path, 'w', encoding='utf-8') as f:
