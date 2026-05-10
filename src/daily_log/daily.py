@@ -3,10 +3,14 @@ import os
 from datetime import datetime
 from datetime import timedelta
 
-REM_FILE = "remanejamentos.json"
+# Configuração de caminhos baseados na estrutura real
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+PASTA = os.path.join(ROOT_DIR, "Daily Log", "Semana")
+REM_FILE = os.path.join(ROOT_DIR, "data", "database", "remanejamentos.json")
 
 def carregar_remanejamentos():
     if not os.path.exists(REM_FILE):
+        # Cria o arquivo vazio se não existir para evitar erros
         return {}
     
     with open(REM_FILE, "r") as f:
@@ -14,8 +18,6 @@ def carregar_remanejamentos():
             return json.load(f)
         except json.JSONDecodeError:
             return {}
-
-PASTA = "Semana"
 
 # =========================
 # BASE
@@ -28,28 +30,42 @@ def salvar_dia(registro, data_ref):
     nome = data_ref.strftime("%Y%m%d")
     caminho = os.path.join(PASTA, f"{nome}.json")
 
-    with open(caminho, "w") as f:
-        json.dump(registro, f, indent=4)
+    with open(caminho, "w", encoding='utf-8') as f:
+        json.dump(registro, f, indent=4, ensure_ascii=False)
 
     print(f"\n✅ Salvo em {caminho}")
 
 # =========================
 # INPUTS
 # =========================
-def input_int(msg, min_val=None, max_val=None, opcional=False):
+def input_int(msg, min_val=None, max_val=None, opcional=False, default=None):
+    if default is not None:
+        msg = f"{msg.strip()} [{default}]"
+    
+    msg = msg.strip() + ": "
+    
     while True:
         val = input(msg).strip()
+        if val == "" and default is not None:
+            return default
         if opcional and val == "":
             return None
-        if val.isdigit():
+        if val.lstrip('-').isdigit():
             val = int(val)
             if (min_val is None or val >= min_val) and (max_val is None or val <= max_val):
                 return val
         print("Valor inválido.")
 
-def input_float(msg, opcional=False):
+def input_float(msg, opcional=False, default=None):
+    if default is not None:
+        msg = f"{msg.strip()} [{default}]"
+    
+    msg = msg.strip() + ": "
+    
     while True:
         val = input(msg).strip()
+        if val == "" and default is not None:
+            return default
         if opcional and val == "":
             return None
         try:
@@ -57,9 +73,22 @@ def input_float(msg, opcional=False):
         except:
             print("Valor inválido.")
 
-def input_horas(msg):
+def input_horas(msg, default=None):
+    if default is not None:
+        if isinstance(default, float):
+            h = int(default)
+            m = int((default - h) * 60)
+            default_str = f"{h}:{m:02d}" if m > 0 else f"{h}"
+        else:
+            default_str = str(default)
+        msg = f"{msg.strip()} [{default_str}]"
+    
+    msg = msg.strip() + ": "
+
     while True:
         val = input(msg).strip()
+        if val == "" and default is not None:
+            return float(default)
 
         try:
             if ":" in val:
@@ -70,12 +99,41 @@ def input_horas(msg):
         except:
             print("Formato inválido (use 9.5 ou 9:30)")
 
-def input_sn(msg):
+def input_sn(msg, default=None):
+    if default is not None:
+        msg = f"{msg.strip()} [{default}]"
+    
+    msg = msg.strip() + ": "
+    
     while True:
         val = input(msg).strip().lower()
+        if val == "" and default is not None:
+            return default
         if val in ["s", "n"]:
             return val
         print("Digite 's' ou 'n'.")
+
+def carregar_prefill(data_ref):
+    # Busca na nova estrutura data/prefill
+    caminho = os.path.join(ROOT_DIR, "data", "prefill", "prefill_daily.json")
+    
+    print(f"DEBUG: Buscando prefill em: {caminho}")
+    
+    if not os.path.exists(caminho):
+        print("DEBUG: Arquivo prefill não encontrado.")
+        return {}
+    
+    try:
+        with open(caminho, "r", encoding='utf-8') as f:
+            data = json.load(f)
+            # Verifica se a data coincide
+            target_date = data_ref.strftime("%Y-%m-%d")
+            print(f"DEBUG: Comparando data {data.get('date')} com {target_date}")
+            if data.get("date") == target_date:
+                return data
+    except Exception as e:
+        print(f"Erro ao carregar prefill: {e}")
+    return {}
 
 # =========================
 # SCORE
@@ -278,32 +336,63 @@ def main():
     garantir_pasta()
 
     data_ref = escolher_data()
+    prefill = carregar_prefill(data_ref)
+    
     dia_semana = data_ref.weekday()
 
     print(f"\n=== LOG ATLETA — {data_ref.strftime('%d/%m/%Y')} ===\n")
 
+    if prefill:
+        print("✨ Dados do wearable detectados e prontos para validação.")
+
     # ===== SONO =====
     print("\n--- 💤 SONO ---")
-    horas = input_horas("Horas de sono: ")
-    qualidade = input_int("Qualidade (0-100): ", 0, 100)
-    bio_manha = input_int("Biocharge manhã (0-100): ", 0, 100)
-    bio_noite = input_int("Biocharge noite (0-100): ", 0, 100)
-    sono_rem = input_int("Sono REM (min) [Enter para pular]: ", min_val=0, opcional=True)
-    sono_profundo = input_int("Sono Profundo (min) [Enter para pular]: ", min_val=0, opcional=True)
-    sono_leve = input_int("Sono Leve (min) [Enter para pular]: ", min_val=0, opcional=True)
+    
+    # Sleep Prefills
+    s_data = prefill.get("sleep", {})
+    b_data = prefill.get("biometrics", {})
+    
+    p_hrs = s_data.get("total_hours")
+    p_bio_start = b_data.get("biocharge_start")
+    p_stress = b_data.get("stress")
+
+    horas = input_horas("Horas de sono", default=p_hrs)
+    qualidade = input_int("Qualidade (0-100)", 0, 100)
+    bio_manha = input_int("Biocharge manhã (0-100)", 0, 100, default=p_bio_start)
+    bio_noite = input_int("Biocharge noite (0-100)", 0, 100)
+    
+    # We convert minutes back to hours or keep as minutes? Daily expects minutes for phases.
+    # Note: my normalizer gives percentages. Let's convert to absolute minutes.
+    # Total minutes = total_hours * 60.
+    total_min = p_hrs * 60 if p_hrs else 0
+    p_rem_min = int(total_min * (s_data.get("rem_sleep_pct", 0)/100)) if total_min else None
+    p_deep_min = int(total_min * (s_data.get("deep_sleep_pct", 0)/100)) if total_min else None
+    p_light_min = int(total_min * (s_data.get("light_sleep_pct", 0)/100)) if total_min else None
+
+    sono_rem = input_int("Sono REM (min)", min_val=0, opcional=True, default=p_rem_min)
+    sono_profundo = input_int("Sono Profundo (min)", min_val=0, opcional=True, default=p_deep_min)
+    sono_leve = input_int("Sono Leve (min)", min_val=0, opcional=True, default=p_light_min)
 
     # ===== ESTADO =====
     print("\n--- ⚡ ESTADO ---")
-    energia = input_int("Energia (0-10): ", 0, 10)
-    foco = input_int("Foco (0-10): ", 0, 10)
-    estresse = input_int("Estresse médio do dia (0-100): ", 0, 100)
+    energia = input_int("Energia (0-10)", 0, 10)
+    foco = input_int("Foco (0-10)", 0, 10)
+    estresse = input_int("Estresse médio do dia (0-100)", 0, 100, default=p_stress)
 
     # ===== CORPO =====
     print("\n--- 📐 CORPO ---")
-    cintura = input_float("Cintura (cm) [Enter para pular]: ", opcional=True)
+    cintura = input_float("Cintura (cm) [Enter para pular]", opcional=True)
+    
+    b_data = prefill.get("biometrics", {})
+    p_peso = b_data.get("weight")
+    
     peso = None
-    if dia_semana == 2:
-        peso = input_float("Peso (kg) [Enter para pular]: ", opcional=True)
+    if dia_semana == 2: # Quarta-feira
+        peso = input_float("Peso (kg) [Enter para pular]", opcional=True, default=p_peso)
+    elif p_peso:
+        # If it's not Wednesday but we have weight from wearable, we can still use it
+        # or just ignore it. Let's stick to the Wednesday rule but allow overwrite if user wants.
+        pass
 
     # ===== HÁBITOS =====
     print("\n--- 💧 HÁBITOS ---")
@@ -311,11 +400,27 @@ def main():
 
     # ===== WEARABLE (Amazfit Bip 6 — BioTracker 6.0) =====
     print("\n--- ⌚ WEARABLE (Bip 6) ---")
-    passos = input_int("Passos: ")
-    rhr = input_int("RHR (Batimentos em repouso): ")
-    pai = input_int("PAI (Ganho no dia) [Enter para pular]: ", min_val=0, opcional=True)
-    hrv = input_int("HRV (ms) [Enter para pular]: ", min_val=0, opcional=True)
-    calorias_ativas = input_int("Calorias Ativas [Enter para pular]: ", min_val=0, opcional=True)
+    
+    p_passos = b_data.get("steps")
+    p_rhr = b_data.get("rhr")
+    p_cal = b_data.get("calories")
+    p_pai = b_data.get("pai")
+    p_hrv = b_data.get("hrv")
+    p_load = b_data.get("sport_load", {})
+
+    passos = input_int("Passos", default=p_passos)
+    rhr = input_int("RHR (Batimentos em repouso)", default=p_rhr)
+    
+    # Se tivermos PAI no prefill, arredondamos para 1 casa decimal
+    default_pai = round(p_pai, 1) if isinstance(p_pai, (int, float)) else None
+    pai = input_float("PAI (Ganho no dia)", opcional=True, default=default_pai)
+    
+    hrv = input_int("HRV (ms) [Enter para pular]", min_val=0, opcional=True, default=p_hrv)
+    calorias_ativas = input_int("Calorias Ativas [Enter para pular]", min_val=0, opcional=True, default=p_cal)
+
+    # Mostrar carga de treino se disponível
+    if p_load and p_load.get("current") is not None:
+        print(f"📈 Carga de Treino: {p_load.get('current')} (Ótimo: {p_load.get('optimal_min')}-{p_load.get('optimal_max')})")
 
     # ===== ALIMENTAÇÃO =====
     print("\nAlimentação do dia:")
@@ -463,7 +568,8 @@ def main():
             "rhr": rhr,
             "pai": pai,
             "hrv_ms": hrv,
-            "calorias_ativas": calorias_ativas
+            "calorias_ativas": calorias_ativas,
+            "sport_load": p_load
         },
         "corpo": {
             "cintura": cintura,

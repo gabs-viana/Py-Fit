@@ -1,0 +1,24 @@
+{
+  "date": "2026-05-09",
+  "sleep": {
+    "total_hours": 8.2,
+    "rem_sleep_pct": 22.6,
+    "deep_sleep_pct": 13.6,
+    "light_sleep_pct": 63.8
+  },
+  "biometrics": {
+    "steps": 1204,
+    "rhr": 54,
+    "calories": 73,
+    "stress": null,
+    "pai": 0.25977325,
+    "spo2": null,
+    "sport_load": {
+      "current": 138,
+      "optimal_min": 391,
+      "optimal_max": 911,
+      "overreaching": 1088
+    }
+  },
+  "api_source": "ZeppCloud"
+}

@@ -1,0 +1,46 @@
+{
+    "data": "07/05/2026",
+    "sono": {
+        "horas": 7.533333333333333,
+        "qualidade": 84,
+        "bio_manha": 90,
+        "bio_noite": 51,
+        "rem_min": 127,
+        "profundo_min": 62,
+        "leve_min": null
+    },
+    "estado": {
+        "energia": 9,
+        "foco": 9,
+        "estresse": 29
+    },
+    "habitos": {
+        "agua_litros": 4.0
+    },
+    "wearable": {
+        "passos": 3430,
+        "rhr": 57,
+        "pai": 0,
+        "hrv_ms": 73,
+        "calorias_ativas": 1859
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "de manh\u00e3, caf\u00e9zinho preto de lei e 1 bala de iogurte. ALmo\u00e7o foi frango desfiado 200g + 170g de arroz + 30g de couve. 1 bala de banana Oliveira + 1 misto quente (mu\u00e7arela e peito de peru). A noite, um pprato com pouco arroz, feijao equivalente, 30g de carne de porco, 2 peda\u00e7os de lasanha de bolonhesa, de sobremesa, 1 picol\u00e9 de chocolate."
+    },
+    "treino": {
+        "planejado": "Descanso",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "remanejado": "n",
+        "justificativa": "",
+        "feeling": ""
+    },
+    "contexto": "Um obst\u00e1culo que notei foi fome precoce, era de manh\u00e3, e senti.",
+    "score": 895,
+    "readiness": 76.9
+}

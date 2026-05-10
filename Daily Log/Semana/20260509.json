@@ -1,0 +1,52 @@
+{
+    "data": "09/05/2026",
+    "sono": {
+        "horas": 8.2,
+        "qualidade": 87,
+        "bio_manha": 93,
+        "bio_noite": 55,
+        "rem_min": 111,
+        "profundo_min": 66,
+        "leve_min": 313
+    },
+    "estado": {
+        "energia": 9,
+        "foco": 10,
+        "estresse": 20
+    },
+    "habitos": {
+        "agua_litros": 2.5
+    },
+    "wearable": {
+        "passos": 1204,
+        "rhr": 57,
+        "pai": 49.0,
+        "hrv_ms": 74,
+        "calorias_ativas": 73,
+        "sport_load": {
+            "current": 138,
+            "optimal_min": 391,
+            "optimal_max": 911,
+            "overreaching": 1088
+        }
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "manha: 2 paos integrais 13 grãos, 2 fatias de presunto, 1 fatia de muçarela. ALmoço: 200g de arroz branco, 1,5 colher de sopa de farinha de mandioca temperada, 250g de asinha de frango frita, 20g de chocolate. Lanche da tarde: 180ml de Sprite zero. Jantar (repeti o exato lanche do café da manhã)"
+    },
+    "treino": {
+        "planejado": "Descanso",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "remanejado": "n",
+        "justificativa": "",
+        "feeling": ""
+    },
+    "contexto": "Muito feliz pelos avanços com o sistema.",
+    "score": 930,
+    "readiness": 78.1
+}

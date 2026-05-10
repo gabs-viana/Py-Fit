@@ -1,0 +1,47 @@
+{
+  "atleta": "Gabs",
+  "data_inicio": "27/04/2026",
+  "assinaturas_fisiologicas": {
+    "recuperacao": {
+      "tipo_predominante": "indefinido",
+      "sensibilidade_ao_sono": "critica",
+      "tolerancia_ao_drift": "moderada",
+      "prioridade_fisiologica": "estabilidade_aerobica"
+    },
+    "cardio": {
+      "fc_baseline": 55,
+      "limiar_drift_alerta": 0.05
+    }
+  },
+  "padroes_detectados": [
+    {
+      "tipo": "sabotagem_estrutural",
+      "contexto": "Final de semana",
+      "impacto": "Queda drástica no score semanal e aumento de estresse fisiológico",
+      "frequencia": 1
+    },
+    {
+      "tipo": "fadiga_latente",
+      "gatilho": "sono_baixo_pos_longo",
+      "impacto": "queda_hrv"
+    },
+    {
+      "tipo": "dependencia_de_rotina",
+      "gatilho": "quebra_estrutura_fds",
+      "impacto": "queda_aguda_de_score_e_desorganizacao_fisiologica"
+    }
+  ],
+  "historico_de_insights": [
+    {
+      "semana": 0,
+      "veredito": "Progressos legítimos apesar da baixa consistência. Sensibilidade positiva à rotina (perda de cintura com pouco esforço).",
+      "gargalo_chave": "Sabotagem no FDS"
+    }
+  ],
+  "gatilhos_de_colapso": [
+    {
+      "gatilho": "Sono < 6h30 + Treino de Alta Intensidade",
+      "consequencia": "Crash de energia prolongado (D+1, D+2)"
+    }
+  ]
+}

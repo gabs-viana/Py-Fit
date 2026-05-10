@@ -1,0 +1,150 @@
+{
+    "timestamp_geracao": "09/05/2026 13:50",
+    "analise_longitudinal": {
+        "dias_desde_ultimo_treino": 4,
+        "status_atual": "Pronto para nova carga"
+    },
+    "memoria_do_atleta": {
+        "atleta": "Gabs",
+        "data_inicio": "27/04/2026",
+        "assinaturas_fisiologicas": {
+            "recuperacao": {
+                "tipo_predominante": "indefinido",
+                "sensibilidade_ao_sono": "alta",
+                "tolerancia_ao_drift": "moderada"
+            },
+            "cardio": {
+                "fc_baseline": 55,
+                "limiar_drift_alerta": 0.05
+            }
+        },
+        "padroes_detectados": [
+            {
+                "tipo": "sabotagem_estrutural",
+                "contexto": "Final de semana",
+                "impacto": "Queda drástica no score semanal e aumento de estresse fisiológico",
+                "frequencia": 1
+            }
+        ],
+        "historico_de_insights": [
+            {
+                "semana": 0,
+                "veredito": "Progressos legítimos apesar da baixa consistência. Sensibilidade positiva à rotina (perda de cintura com pouco esforço).",
+                "gargalo_chave": "Sabotagem no FDS"
+            }
+        ],
+        "gatilhos_de_colapso": [
+            {
+                "gatilho": "Sono < 6h30 + Treino de Alta Intensidade",
+                "consequencia": "Crash de energia prolongado (D+1, D+2)"
+            }
+        ]
+    },
+    "baseline_treino_d0": null,
+    "ultimo_treino_relevante": {
+        "id": "fit_analysis",
+        "tipo": "caminhada",
+        "score_fit": 4,
+        "drift_aerobico": 0.094,
+        "dominancia_simpatica": null,
+        "pacing_emocional": null,
+        "fluxo_util_min": null,
+        "recuperacao_fc": -0.4,
+        "gap_pace": null,
+        "esforço_perc": 3.1,
+        "data_treino": "05/05/2026"
+    },
+    "evolucao_pos_treino": {},
+    "meta_analise": {
+        "recuperacao": {},
+        "aderencia": {
+            "baixa_execucao_pos_esforco": false,
+            "fadiga_percebida_impacto_operacional": "moderada"
+        },
+        "alimentacao": {
+            "ultraprocessado_detectado": false,
+            "proteina_inconsistente": true,
+            "refeicoes_omitidas_estimadas": 0,
+            "densidade_nutricional": "boa"
+        }
+    },
+    "resumo_semana_daily": [
+        {
+            "data": "27/04/2026",
+            "readiness": null,
+            "energia": 10,
+            "stress": 2,
+            "sono_horas": 6.47,
+            "hrv": null,
+            "rhr": null,
+            "treino_executado": "s",
+            "alimentacao_desc": ""
+        },
+        {
+            "data": "28/04/2026",
+            "readiness": null,
+            "energia": 9,
+            "stress": 8,
+            "sono_horas": 9.1,
+            "hrv": null,
+            "rhr": null,
+            "treino_executado": "n",
+            "alimentacao_desc": ""
+        },
+        {
+            "data": "29/04/2026",
+            "readiness": null,
+            "energia": 3,
+            "stress": 9,
+            "sono_horas": 6.316666666666666,
+            "hrv": null,
+            "rhr": null,
+            "treino_executado": "s",
+            "alimentacao_desc": ""
+        },
+        {
+            "data": "30/04/2026",
+            "readiness": null,
+            "energia": 7,
+            "stress": 6,
+            "sono_horas": 7.116666666666666,
+            "hrv": null,
+            "rhr": null,
+            "treino_executado": "s",
+            "alimentacao_desc": ""
+        },
+        {
+            "data": "01/05/2026",
+            "readiness": null,
+            "energia": 8,
+            "stress": 9,
+            "sono_horas": 10.95,
+            "hrv": null,
+            "rhr": null,
+            "treino_executado": "n",
+            "alimentacao_desc": ""
+        },
+        {
+            "data": "02/05/2026",
+            "readiness": null,
+            "energia": 9,
+            "stress": 4,
+            "sono_horas": 7.55,
+            "hrv": null,
+            "rhr": null,
+            "treino_executado": "n",
+            "alimentacao_desc": "De manhã, 2 ou 3 canecas de leite com café, 1 pedaço de bolo de chocolate. Almoço foi arroz, carne moida e ovo, sem lanche da tarde, o jantar foi lanche com batata frita. "
+        },
+        {
+            "data": "03/05/2026",
+            "readiness": null,
+            "energia": 7,
+            "stress": 7,
+            "sono_horas": 8.2,
+            "hrv": null,
+            "rhr": null,
+            "treino_executado": "n",
+            "alimentacao_desc": "2 canecas de café com leite de manhã, arroz com linguiça e carne de porco assada no almoço com 2 copos de refri (coca e guaraná), 1 pedaço pequeno de bolo de leite ninho a tarde, sem jantar + 1 copo de sprite 0 apenas."
+        }
+    ]
+}
