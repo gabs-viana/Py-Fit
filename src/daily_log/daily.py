@@ -329,6 +329,101 @@ def escolher_dia_remanejamento(data_ref):
             return dias[int(escolha)-1]
         print("Opção inválida.")
 
+# =========# =========================
+# REVISÃO E EDIÇÃO
+# =========================
+def exibir_revisao(registro):
+    print("\n" + "="*40)
+    print("      📋 REVISÃO DOS DADOS DO DIA")
+    print("="*40)
+    
+    indices = []
+    
+    # Grupos de dados para exibição organizada
+    grupos = [
+        ("💤 SONO", [
+            ("Horas", f"{int(registro['sono']['horas'])}h{int((registro['sono']['horas'] % 1) * 60):02d}" if registro['sono']['horas'] else "0h00"),
+            ("Qualidade", registro["sono"]["qualidade"]),
+            ("Bio Manhã", registro["sono"]["bio_manha"]),
+            ("Bio Noite", registro["sono"]["bio_noite"]),
+            ("REM (min)", registro["sono"]["rem_min"]),
+            ("Profundo (min)", registro["sono"]["profundo_min"]),
+        ]),
+        ("⚡ ESTADO", [
+            ("Energia", registro["estado"]["energia"]),
+            ("Foco", registro["estado"]["foco"]),
+            ("Estresse", registro["estado"]["estresse"]),
+        ]),
+        ("⌚ WEARABLE", [
+            ("Passos", registro["wearable"]["passos"]),
+            ("RHR", registro["wearable"]["rhr"]),
+            ("PAI", registro["wearable"]["pai"]),
+            ("HRV (ms)", registro["wearable"]["hrv_ms"]),
+            ("Calorias", registro["wearable"]["calorias_ativas"]),
+        ]),
+        ("📐 CORPO/HÁBITOS", [
+            ("Peso", f"{registro['corpo']['peso']} kg" if registro["corpo"]["peso"] else "Não pesado"),
+            ("Cintura", registro["corpo"]["cintura"]),
+            ("Água", registro["habitos"]["agua_litros"]),
+        ]),
+        ("🏋️ TREINO", [
+            ("Executado", registro["treino"]["executado"]),
+        ] + ([
+            ("Completude", registro["treino"]["completude"]),
+            ("Intensidade", registro["treino"]["intensidade"]),
+        ] if registro["treino"]["planejado"] != "Descanso" else [])),
+        ("📝 CONTEXTO", [
+            ("Alimentação", registro["alimentacao"]["descricao"][:50] + "..." if len(registro["alimentacao"]["descricao"]) > 50 else registro["alimentacao"]["descricao"]),
+            ("Obstáculo", registro["contexto"][:50] + "..." if len(registro["contexto"]) > 50 else registro["contexto"]),
+        ])
+    ]
+
+    idx = 1
+    mapping = {}
+    
+    for titulo, campos in grupos:
+        print(f"\n{titulo}")
+        for label, valor in campos:
+            print(f"  {idx:2d}. {label:15}: {valor}")
+            mapping[idx] = (titulo, label)
+            idx += 1
+    
+    print("\n" + "="*40)
+    print(" 0. ✅ CONFIRMAR TUDO E SALVAR")
+    print("="*40)
+    return mapping
+
+def editar_campo(idx, mapping, registro):
+    if idx not in mapping:
+        return
+    
+    titulo, label = mapping[idx]
+    print(f"\nEditando [{label}]...")
+    
+    if label == "Horas": registro["sono"]["horas"] = input_horas("Novo valor", default=registro["sono"]["horas"])
+    elif label == "Qualidade": registro["sono"]["qualidade"] = input_int("Nova Qualidade", 0, 100, default=registro["sono"]["qualidade"])
+    elif label == "Bio Manhã": registro["sono"]["bio_manha"] = input_int("Novo Bio Manhã", 0, 100, default=registro["sono"]["bio_manha"])
+    elif label == "Bio Noite": registro["sono"]["bio_noite"] = input_int("Novo Bio Noite", 0, 100, default=registro["sono"]["bio_noite"])
+    elif label == "REM (min)": registro["sono"]["rem_min"] = input_int("Novo REM", 0, 500, default=registro["sono"]["rem_min"])
+    elif label == "Profundo (min)": registro["sono"]["profundo_min"] = input_int("Novo Profundo", 0, 500, default=registro["sono"]["profundo_min"])
+    elif label == "Energia": registro["estado"]["energia"] = input_int("Nova Energia", 0, 10, default=registro["estado"]["energia"])
+    elif label == "Foco": registro["estado"]["foco"] = input_int("Novo Foco", 0, 10, default=registro["estado"]["foco"])
+    elif label == "Estresse": registro["estado"]["estresse"] = input_int("Novo Estresse", 0, 100, default=registro["estado"]["estresse"])
+    elif label == "Passos": registro["wearable"]["passos"] = input_int("Novos Passos", 0, 100000, default=registro["wearable"]["passos"])
+    elif label == "RHR": registro["wearable"]["rhr"] = input_int("Novo RHR", 30, 200, default=registro["wearable"]["rhr"])
+    elif label == "PAI": registro["wearable"]["pai"] = input_float("Novo PAI", default=registro["wearable"]["pai"])
+    elif label == "HRV (ms)": registro["wearable"]["hrv_ms"] = input_int("Novo HRV", 0, 200, default=registro["wearable"]["hrv_ms"])
+    elif label == "Calorias": registro["wearable"]["calorias_ativas"] = input_int("Novas Calorias", 0, 5000, default=registro["wearable"]["calorias_ativas"])
+    elif label == "Peso": registro["corpo"]["peso"] = input_float("Novo Peso", default=registro["corpo"]["peso"])
+    elif label == "Cintura": registro["corpo"]["cintura"] = input_float("Nova Cintura", default=registro["corpo"]["cintura"])
+    elif label == "Água": registro["habitos"]["agua_litros"] = input_float("Nova Água", default=registro["habitos"]["agua_litros"])
+    elif label == "Executado": registro["treino"]["executado"] = input_sn("Executou? (s/n)", default=registro["treino"]["executado"])
+    elif label == "Completude": registro["treino"]["completude"] = input_int("Nova Completude", 0, 100, default=registro["treino"]["completude"])
+    elif label == "Intensidade": registro["treino"]["intensidade"] = input_int("Nova Intensidade", 0, 10, default=registro["treino"]["intensidade"])
+    elif label == "Alimentação": registro["alimentacao"]["descricao"] = input("Nova descrição: ").strip()
+    elif label == "Obstáculo": registro["contexto"] = input("Novo obstáculo: ").strip()
+
+
 # =========================
 # MAIN
 # =========================
@@ -337,261 +432,129 @@ def main():
 
     data_ref = escolher_data()
     prefill = carregar_prefill(data_ref)
-    
     dia_semana = data_ref.weekday()
 
     print(f"\n=== LOG ATLETA — {data_ref.strftime('%d/%m/%Y')} ===\n")
 
-    if prefill:
-        print("✨ Dados do wearable detectados e prontos para validação.")
-
-    # ===== SONO =====
-    print("\n--- 💤 SONO ---")
-    
-    # Sleep Prefills
+    # PREPARAÇÃO DOS DADOS (Prefill + Defaults)
     s_data = prefill.get("sleep", {})
     b_data = prefill.get("biometrics", {})
+    l_data = prefill.get("longitudinal", {})
     
     p_hrs = s_data.get("total_hours")
-    p_bio_start = b_data.get("biocharge_start")
+    p_rhr = b_data.get("rhr")
+    p_hrv = b_data.get("hrv")
     p_stress = b_data.get("stress")
-
-    horas = input_horas("Horas de sono", default=p_hrs)
-    qualidade = input_int("Qualidade (0-100)", 0, 100)
-    bio_manha = input_int("Biocharge manhã (0-100)", 0, 100, default=p_bio_start)
-    bio_noite = input_int("Biocharge noite (0-100)", 0, 100)
+    p_passos = b_data.get("steps")
+    p_cal = b_data.get("calories")
+    p_pai = b_data.get("pai")
+    p_peso = b_data.get("weight")
+    p_bio_start = b_data.get("biocharge_waking")
     
-    # We convert minutes back to hours or keep as minutes? Daily expects minutes for phases.
-    # Note: my normalizer gives percentages. Let's convert to absolute minutes.
-    # Total minutes = total_hours * 60.
     total_min = p_hrs * 60 if p_hrs else 0
     p_rem_min = int(total_min * (s_data.get("rem_sleep_pct", 0)/100)) if total_min else None
     p_deep_min = int(total_min * (s_data.get("deep_sleep_pct", 0)/100)) if total_min else None
     p_light_min = int(total_min * (s_data.get("light_sleep_pct", 0)/100)) if total_min else None
 
-    sono_rem = input_int("Sono REM (min)", min_val=0, opcional=True, default=p_rem_min)
-    sono_profundo = input_int("Sono Profundo (min)", min_val=0, opcional=True, default=p_deep_min)
-    sono_leve = input_int("Sono Leve (min)", min_val=0, opcional=True, default=p_light_min)
-
-    # ===== ESTADO =====
-    print("\n--- ⚡ ESTADO ---")
+    # 1. PERGUNTAS MANUAIS (O que a Zepp não sabe)
+    print("\n--- ⚡ ESTADO & MANUAIS ---")
     energia = input_int("Energia (0-10)", 0, 10)
     foco = input_int("Foco (0-10)", 0, 10)
-    estresse = input_int("Estresse médio do dia (0-100)", 0, 100, default=p_stress)
-
-    # ===== CORPO =====
-    print("\n--- 📐 CORPO ---")
+    qualidade_sono = input_int("Qualidade do Sono (0-100)", 0, 100)
+    bio_noite = input_int("Biocharge Noite (0-100)", 0, 100)
+    agua = input_float("Água (Litros)")
     cintura = input_float("Cintura (cm) [Enter para pular]", opcional=True)
     
-    b_data = prefill.get("biometrics", {})
-    p_peso = b_data.get("weight")
-    
-    peso = None
-    if dia_semana == 2: # Quarta-feira
-        peso = input_float("Peso (kg) [Enter para pular]", opcional=True, default=p_peso)
-    elif p_peso:
-        # If it's not Wednesday but we have weight from wearable, we can still use it
-        # or just ignore it. Let's stick to the Wednesday rule but allow overwrite if user wants.
-        pass
-
-    # ===== HÁBITOS =====
-    print("\n--- 💧 HÁBITOS ---")
-    agua = input_float("Água (Litros): ")
-
-    # ===== WEARABLE (Amazfit Bip 6 — BioTracker 6.0) =====
-    print("\n--- ⌚ WEARABLE (Bip 6) ---")
-    
-    p_passos = b_data.get("steps")
-    p_rhr = b_data.get("rhr")
-    p_cal = b_data.get("calories")
-    p_pai = b_data.get("pai")
-    p_hrv = b_data.get("hrv")
-    p_load = b_data.get("sport_load", {})
-
-    passos = input_int("Passos", default=p_passos)
-    rhr = input_int("RHR (Batimentos em repouso)", default=p_rhr)
-    
-    # Se tivermos PAI no prefill, arredondamos para 1 casa decimal
-    default_pai = round(p_pai, 1) if isinstance(p_pai, (int, float)) else None
-    pai = input_float("PAI (Ganho no dia)", opcional=True, default=default_pai)
-    
-    hrv = input_int("HRV (ms) [Enter para pular]", min_val=0, opcional=True, default=p_hrv)
-    calorias_ativas = input_int("Calorias Ativas [Enter para pular]", min_val=0, opcional=True, default=p_cal)
-
-    # Mostrar carga de treino se disponível
-    if p_load and p_load.get("current") is not None:
-        print(f"📈 Carga de Treino: {p_load.get('current')} (Ótimo: {p_load.get('optimal_min')}-{p_load.get('optimal_max')})")
-
-    # ===== ALIMENTAÇÃO =====
-    print("\nAlimentação do dia:")
-    alimentacao_texto = input("Descreva tudo que comeu hoje: ").strip()
-
-    # ===== TREINO =====
-    treinos = {
-        0: "Upper",
-        1: "Corrida",
-        2: "Lower",
-        4: "Futebol"
-    }
-
-    remanejamentos = carregar_remanejamentos()
-    chave_hoje = data_ref.strftime("%Y%m%d")
-    remanejado = "n"
-
-    if chave_hoje in remanejamentos:
-        planejado = remanejamentos[chave_hoje]["treino"]
-        print(f"Treino planejado (remanejado): {planejado}")
-        
-        del remanejamentos[chave_hoje]
-
-        with open(REM_FILE, "w") as f:
-            json.dump(remanejamentos, f, indent=4)
-            
+    print("\n--- 🥗 ALIMENTAÇÃO ---")
+    nutri_prefill = prefill.get("nutrition", {})
+    logs_zepp = nutri_prefill.get("meal_logs", [])
+    if logs_zepp:
+        print("✅ Logs detectados na Zepp Cloud (usando automação).")
+        alimentacao_texto = " | ".join(logs_zepp)
     else:
-        planejado = treinos.get(dia_semana, "Descanso")
-        print(f"Treino planejado: {planejado}")
+        alimentacao_texto = input("Descreva sua alimentação (Vazio para pular): ").strip()
 
-    if planejado == "Descanso":
-        executado = "n"
-        completude = 0
-        intensidade = 0
-        remanejado = "n"
-        justificativa = ""
-        feeling_treino = ""
-        print("Dia de descanso — sem treino.")
+    # 2. TREINO
+    print("\n--- 🏋️ TREINO ---")
+    treinos_base = {0: "Upper", 1: "Corrida", 2: "Lower", 4: "Futebol"}
+    planejado = treinos_base.get(dia_semana, "Descanso")
+    
+    # Check Workout Prefill
+    w_detected = b_data.get("workout_detected", False)
+    w_info = b_data.get("workout_info", {})
+    
+    if w_detected:
+        print(f"✅ Treino Detectado: {w_info.get('type_name')} ({w_info.get('duration_min')} min)")
+        executado = "s"
+        completude = 100
+        intensidade = 8 # Default para treino detectado
     else:
-        executado = input_sn("Executou? (s/n): ")
-
-        if executado == "s":
-            completude = input_int("Completude (%) 0-100: ", 0, 100)
-            intensidade = input_int("Intensidade (0-10): ", 0, 10)
-            remanejado = "n"
-            justificativa = ""
-            feeling_treino = input("Como se sentiu no treino? (Enter para pular): ").strip()
+        print(f"Planejado: {planejado}")
+        if planejado == "Descanso":
+            executado, completude, intensidade = "n", 0, 0
         else:
-            completude = 0
-            intensidade = 0
-            remanejado = input_sn("Remanejar? (s/n): ")
-            justificativa = input("Justificativa: ")
-            feeling_treino = ""
+            executado = input_sn("Executou? (s/n)")
+            if executado == "s":
+                completude = input_int("Completude (%)", 0, 100)
+                intensidade = input_int("Intensidade (0-10)", 0, 10)
+            else:
+                completude, intensidade = 0, 0
 
-    if planejado != "Descanso" and remanejado == "s":
-        dias_disp = dias_restantes(data_ref)
-        if not dias_disp:
-            print("\n⚠️ Domingo é o último dia da semana. Não há para onde remanejar!")
-            remanejado = "n"
-        else:
-            destino = escolher_dia_remanejamento(data_ref)
-            chave_destino = destino.strftime("%Y%m%d")
-            cancelar = False
+    feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
+    obstaculo_dia = input("Obstáculo/Vitória do dia: ").strip()
 
-            # Verifica se já há remanejamento lá
-            if chave_destino in remanejamentos:
-                treino_agendado = remanejamentos[chave_destino]["treino"]
-                print(f"⚠️ Já existe um remanejamento para esse dia ({treino_agendado}).")
-                opc = input("Deseja sobrescrever? (s/n): ").strip().lower()
-                if opc != "s":
-                    print("Remanejamento cancelado.")
-                    cancelar = True
-
-            if not cancelar:
-                treino_existente = verificar_treino_existente(destino)
-
-                # Se não há json criado para o dia, checa se há um treino padrão para o dia da semana
-                if treino_existente is None:
-                    treino_existente = treinos.get(destino.weekday(), "Descanso")
-
-                # Verifica se existe um treino real (que não seja Descanso)
-                if treino_existente and treino_existente != "Descanso":
-                    print(f"⚠️ Já existe treino ({treino_existente}) nesse dia.")
-                    print(f"Você está tentando mover: {planejado}")
-                    
-                    opc = input("Deseja substituir? (s/n): ").strip().lower()
-                    if opc != "s":
-                        print("Remanejamento cancelado.")
-                    else:
-                        salvar_remanejamento(destino, planejado, data_ref)
-
-                else:
-                    salvar_remanejamento(destino, planejado, data_ref)
-
-    # ===== CONTEXTO DO DIA =====
-    obstaculo_dia = input("\nPrincipal obstáculo ou vitória do dia (Enter para pular): ").strip()
-
-    # ===== SCORE =====
-    s_sono = score_sono(horas, qualidade, bio_manha)
-    s_treino = score_treino(executado, completude, intensidade)
-    s_estado = score_estado(energia, foco, estresse)
-
-    if planejado == "Descanso":
-        score_base = s_sono + s_estado
-        score_total = int((score_base / 600) * 1000)
-    else:
-        score_total = s_sono + s_treino + s_estado
-
-    # ===== READINESS INDEX V6 =====
-    sono_total_min = int(horas * 60) if horas else None
-    readiness = calcular_readiness(hrv, rhr, sono_profundo, sono_total_min, estresse)
-
-    print(f"\n📊 Score do dia: {score_total}/1000")
-    print(feedback(score_total))
-    if readiness is not None:
-        if readiness >= 75:
-            r_label = "🟢 PRONTO"
-        elif readiness >= 50:
-            r_label = "🟡 ALERTA"
-        else:
-            r_label = "🔴 RECUPERAR"
-        print(f"🧬 Readiness Index: {readiness}/100 — {r_label}")
-
+    # MONTAGEM DO REGISTRO INICIAL
     registro = {
         "data": data_ref.strftime("%d/%m/%Y"),
         "sono": {
-            "horas": horas,
-            "qualidade": qualidade,
-            "bio_manha": bio_manha,
-            "bio_noite": bio_noite,
-            "rem_min": sono_rem,
-            "profundo_min": sono_profundo,
-            "leve_min": sono_leve
+            "horas": p_hrs, "qualidade": qualidade_sono, 
+            "bio_manha": p_bio_start, "bio_noite": bio_noite,
+            "rem_min": p_rem_min, "profundo_min": p_deep_min, "leve_min": p_light_min
         },
-        "estado": {
-            "energia": energia,
-            "foco": foco,
-            "estresse": estresse
-        },
-        "habitos": {
-            "agua_litros": agua
-        },
+        "estado": {"energia": energia, "foco": foco, "estresse": p_stress},
+        "habitos": {"agua_litros": agua},
         "wearable": {
-            "passos": passos,
-            "rhr": rhr,
-            "pai": pai,
-            "hrv_ms": hrv,
-            "calorias_ativas": calorias_ativas,
-            "sport_load": p_load
+            "passos": p_passos, "rhr": p_rhr, "pai": round(p_pai, 1) if p_pai else 0,
+            "hrv_ms": p_hrv, "calorias_ativas": p_cal, "sport_load": b_data.get("sport_load")
         },
-        "corpo": {
-            "cintura": cintura,
-            "peso": peso
-        },
-        "alimentacao": {
-            "descricao": alimentacao_texto
-        },
+        "corpo": {"cintura": cintura, "peso": p_peso},
+        "alimentacao": {"descricao": alimentacao_texto},
         "treino": {
-            "planejado": planejado,
-            "executado": executado,
-            "completude": completude,
-            "intensidade": intensidade,
-            "remanejado": remanejado,
-            "justificativa": justificativa,
-            "feeling": feeling_treino
+            "planejado": planejado, "executado": executado, 
+            "completude": completude, "intensidade": intensidade, "feeling": feeling_treino
         },
-        "contexto": obstaculo_dia,
-        "score": score_total,
-        "readiness": readiness
+        "contexto": obstaculo_dia
     }
 
+    # 3. LOOP DE REVISÃO E EDIÇÃO
+    while True:
+        mapping = exibir_revisao(registro)
+        escolha = input("\nDigite o ID para editar ou 0 para SALVAR: ").strip()
+        
+        if escolha == "0":
+            break
+        
+        if escolha.isdigit():
+            editar_campo(int(escolha), mapping, registro)
+        else:
+            print("Opção inválida.")
+
+    # FINALIZAÇÃO (Cálculo de Scores e Salvamento)
+    s_sono = score_sono(registro["sono"]["horas"], registro["sono"]["qualidade"], registro["sono"]["bio_manha"])
+    s_treino = score_treino(registro["treino"]["executado"], registro["treino"]["completude"], registro["treino"]["intensidade"])
+    s_estado = score_estado(registro["estado"]["energia"], registro["estado"]["foco"], registro["estado"]["estresse"])
+    
+    if registro["treino"]["planejado"] == "Descanso":
+        score_total = int(((s_sono + s_estado) / 600) * 1000)
+    else:
+        score_total = s_sono + s_treino + s_estado
+    
+    registro["score"] = score_total
+    registro["readiness"] = prefill.get("readiness_index", {}).get("score")
+    
+    print(f"\n📊 Score Final: {score_total}/1000")
+    print(feedback(score_total))
+    
     salvar_dia(registro, data_ref)
 
 if __name__ == "__main__":
