@@ -3,7 +3,9 @@ import os
 import shutil
 from datetime import datetime
 
-PASTA = "Semana"
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+PASTA = os.path.join(ROOT_DIR, "Daily Log", "Semana")
+PASTA_CONSOLIDADA = os.path.join(ROOT_DIR, "Daily Log", "Semanas_consolidadas")
 
 # =========================
 # LOAD
@@ -29,7 +31,7 @@ def carregar_resumo_anterior():
     if idx_atual == 0:
         return None
     idx_anterior = idx_atual - 1
-    caminho = os.path.join("Semanas_consolidadas", f"Semana_{idx_anterior}", "resumo.json")
+    caminho = os.path.join(PASTA_CONSOLIDADA, f"Semana_{idx_anterior}", "resumo.json")
     if os.path.exists(caminho):
         with open(caminho, "r", encoding="utf-8") as f:
             try:
@@ -91,7 +93,7 @@ def analisar_bloco(dados):
 # MAIN
 # =========================
 def proxima_semana():
-    pasta_base = "Semanas_consolidadas"
+    pasta_base = PASTA_CONSOLIDADA
 
     if not os.path.exists(pasta_base):
         os.makedirs(pasta_base)
@@ -105,8 +107,8 @@ def proxima_semana():
     return max(indices) + 1
 
 def consolidar_semana(resumo=None):
-    pasta_origem = "Semana"
-    pasta_destino_base = "Semanas_consolidadas"
+    pasta_origem = PASTA
+    pasta_destino_base = PASTA_CONSOLIDADA
 
     idx = proxima_semana()
     pasta_destino = os.path.join(pasta_destino_base, f"Semana_{idx}")
@@ -159,17 +161,28 @@ def calcular():
     agua = media([d.get("habitos", {}).get("agua_litros") for d in semana])
     alcool_dias = sum([1 for d in semana if d.get("habitos", {}).get("alcool") == "s"])
 
+    # Wearable V7
     passos = media([d.get("wearable", {}).get("passos") for d in semana])
     rhr = media([d.get("wearable", {}).get("rhr") for d in semana])
     pai = media([d.get("wearable", {}).get("pai") for d in semana])
+    hrv = media([d.get("wearable", {}).get("hrv_ms") for d in semana])
+    calorias = media([d.get("wearable", {}).get("calorias_ativas") for d in semana])
+    sport_load = media([d.get("wearable", {}).get("sport_load", {}).get("current") for d in semana])
 
-    horas = media([d["sono"]["horas"] for d in semana])
-    qualidade = media([d["sono"]["qualidade"] for d in semana])
-    bio_manha = media([d["sono"]["bio_manha"] for d in semana])
+    # Sono V7
+    horas = media([d.get("sono", {}).get("horas") for d in semana])
+    qualidade = media([d.get("sono", {}).get("qualidade") for d in semana])
+    bio_manha = media([d.get("sono", {}).get("bio_manha") for d in semana])
+    bio_noite = media([d.get("sono", {}).get("bio_noite") for d in semana])
+    rem = media([d.get("sono", {}).get("rem_min") for d in semana])
+    profundo = media([d.get("sono", {}).get("profundo_min") for d in semana])
 
-    energia = media([d["estado"]["energia"] for d in semana])
-    foco = media([d["estado"]["foco"] for d in semana])
-    estresse = media([d["estado"]["estresse"] for d in semana])
+    # Readiness V7
+    readiness = media([d.get("readiness") for d in semana])
+
+    energia = media([d.get("estado", {}).get("energia") for d in semana])
+    foco = media([d.get("estado", {}).get("foco") for d in semana])
+    estresse = media([d.get("estado", {}).get("estresse") for d in semana])
 
     textos_alimentacao = []
     textos_treino = []
@@ -210,7 +223,7 @@ def calcular():
     comp_media = media(completude)
     int_media = media(intensidade)
 
-    scores = [d["score"] for d in semana]
+    scores = [d.get("score") for d in semana]
     score_medio = media(scores)
 
     def classificar(score):
@@ -244,6 +257,12 @@ def calcular():
 
     if cintura_oficial and delta_cintura_real and delta_cintura_real >= 0:
         diagnostico.append("Cintura não reduziu na semana (base quarta) → revisar déficit/calorias")
+    
+    if hrv and hrv < 45:
+        diagnostico.append("HRV médio baixo → sinal de fadiga ou sobrecarga")
+        
+    if readiness and readiness < 60:
+        diagnostico.append("Readiness médio baixo → priorizar recuperação")
         
     # ===== COMPARAÇÃO (VARIÂNCIA) =====
     resumo_anterior = carregar_resumo_anterior()
@@ -266,6 +285,14 @@ def calcular():
             rhr_ant = resumo_anterior.get("wearable", {}).get("rhr_media")
             if rhr_ant and rhr:
                 variacoes["rhr_media"] = round(rhr - rhr_ant, 2)
+            
+            hrv_ant = resumo_anterior.get("wearable", {}).get("hrv_media")
+            if hrv_ant and hrv:
+                variacoes["hrv_media"] = round(hrv - hrv_ant, 2)
+            
+            readiness_ant = resumo_anterior.get("performance", {}).get("readiness_medio")
+            if readiness_ant and readiness:
+                variacoes["readiness_medio"] = round(readiness - readiness_ant, 2)
                 
             taxa_exec_ant = resumo_anterior.get("treino", {}).get("taxa_execucao")
             if taxa_exec_ant is not None:
@@ -294,7 +321,13 @@ def calcular():
         "wearable": {
             "passos_media": passos,
             "rhr_media": rhr,
-            "pai_media": pai
+            "pai_media": pai,
+            "hrv_media": hrv,
+            "calorias_ativas_media": calorias,
+            "sport_load_media": sport_load
+        },
+        "performance": {
+            "readiness_medio": readiness
         },
         "treino": {
             "taxa_execucao": taxa_exec,
@@ -304,6 +337,10 @@ def calcular():
         "sono_estado": {
             "horas_media": horas,
             "qualidade_media": qualidade,
+            "bio_manha_media": bio_manha,
+            "bio_noite_media": bio_noite,
+            "rem_min_medio": rem,
+            "profundo_min_medio": profundo,
             "energia_media": energia,
             "foco_media": foco,
             "estresse_medio": estresse
