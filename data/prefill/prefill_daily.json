@@ -1,7 +1,7 @@
 {
   "date": "2026-05-10",
   "readiness_index": {
-    "score": 82.6,
+    "score": 80.1,
     "status": "Recuperado",
     "components": {
       "sleep_impact": 81,
@@ -18,28 +18,30 @@
     "insight": "Voc\u00ea fez um \u00f3timo trabalho ao manter um hor\u00e1rio de dormir consistente na \u00faltima semana! Ter um hor\u00e1rio consistente para dormir e acordar \u00e9 uma das coisas mais importantes que voc\u00ea pode fazer para manter a sa\u00fade do seu sono."
   },
   "nutrition": {
-    "calories_in": 485,
-    "protein": 30.9,
-    "carbs": 43.6,
-    "fat": 21.3,
-    "fiber": 6.0,
+    "calories_in": 1593,
+    "protein": 69.6,
+    "carbs": 168.5,
+    "fat": 70.3,
+    "fiber": 10.8,
     "meal_logs": [
+      "2 canecas de caf\u00e9 preto sem a\u00e7\u00facar e leite integral.\npropor\u00e7\u00e3o 50/50",
       "sandu\u00edche com:\n2 fatias P\u00e3o integral 7 gr\u00e3os da Nutri Breads (58% integral)\n2 fatias de presunto\n1 fatia de queijo mu\u00e7arela \n1 fatia pequena de queijo branco\n1 sach\u00ea pequeno (umas 10g) de maionese verde",
-      "2 canecas de caf\u00e9 preto sem a\u00e7\u00facar e leite integral.\npropor\u00e7\u00e3o 50/50"
+      "1 prato de aprox. 180g de macarr\u00e3o com carne mo\u00edda, 1 copo de 200ml de guaran\u00e1 Tuba Jujuba, 1 bombom sonho de valsa",
+      "2 fatias p\u00e3o Nutri Breads 7 gr\u00e3os, 1 fatia de presunto, 1 fatia de mu\u00e7arela, 2 fatias pequenas de queijo branco, meio sach\u00ea de maionese branca, meio sach\u00ea de maionese verde, 2 bolachas recheadas Trakinas"
     ]
   },
   "biometrics": {
-    "steps": 661,
+    "steps": 3084,
     "weight": null,
     "bmi": null,
     "rhr": 54,
     "hrv": 73,
     "readiness": 87,
-    "biocharge_waking": 95,
-    "biocharge_current": 87,
-    "calories": 31,
-    "stress": 14,
-    "pai": 49.196526,
+    "biocharge_waking": null,
+    "biocharge_current": 53,
+    "calories": 127,
+    "stress": 51,
+    "pai": 49.458687,
     "pai_gain": 0,
     "workout_detected": false,
     "workout_info": null,
@@ -55,7 +57,7 @@
     "baselines_30d": {
       "hrv": 72.3,
       "rhr": 53.8,
-      "stress": 26.2,
+      "stress": 26.4,
       "readiness": 85.7
     },
     "trends": {
@@ -72,10 +74,10 @@
         "direction": "stable"
       },
       "stress": {
-        "current": 14,
-        "baseline": 26.2,
-        "diff_pct": -46.6,
-        "direction": "down"
+        "current": 51,
+        "baseline": 26.4,
+        "diff_pct": 93.2,
+        "direction": "up"
       },
       "readiness": {
         "current": 87,

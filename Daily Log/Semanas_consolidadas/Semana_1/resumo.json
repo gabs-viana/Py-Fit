@@ -1,0 +1,86 @@
+{
+    "geral": {
+        "dias": 7,
+        "score_medio": 847.86,
+        "classificacao": "Forte"
+    },
+    "variacoes_vs_semana_anterior": {
+        "score_medio": 232.43,
+        "cintura_media": -1.33,
+        "taxa_execucao": 25.0
+    },
+    "corpo": {
+        "cintura_oficial_quarta": 76.0,
+        "peso_oficial_quarta": 64.8,
+        "cintura_media": 76.0,
+        "delta_cintura_real": 0.0
+    },
+    "habitos": {
+        "agua_litros_media": 3.86,
+        "alcool_dias_uso": 0
+    },
+    "wearable": {
+        "passos_media": 3974.71,
+        "rhr_media": 55.0,
+        "pai_media": 20.36,
+        "hrv_media": 72.5,
+        "calorias_ativas_media": 960.0,
+        "sport_load_media": 138.0
+    },
+    "performance": {
+        "readiness_medio": 79.05
+    },
+    "treino": {
+        "taxa_execucao": 75.0,
+        "completude_media": 100.0,
+        "intensidade_media": 10.0
+    },
+    "sono_estado": {
+        "horas_media": 7.36,
+        "qualidade_media": 79.86,
+        "bio_manha_media": 92.57,
+        "bio_noite_media": 50.0,
+        "rem_min_medio": 120.25,
+        "profundo_min_medio": 70.25,
+        "energia_media": 8.71,
+        "foco_media": 9.0,
+        "estresse_medio": 31.43
+    },
+    "logs_narrativos": {
+        "alimentacao": [
+            "[Segunda - 04/05/2026]: de café da manhã, quebrei o jejum com 200ml de leite integral + whey Growth cookies and Cream (1 dose), seguido de café preto puro, muita hidratação matinal, almoço reforçado com carne assada acebolada, arroz, salada de alface e tomate, batatas fritas, salzinho e vinagre de alcool.a tarde, 2 fatias de wickbold roxo + 1 fatia de peito de peru + 2 fatias de queijo muçarela. A noite foi mais fraco, 1 pedaço pequeno de bolo de chocolate, 1 caneca de leite com nescau e 2 fatias de pao wickbold roxo + 1 fatia de presunto + 1 fatia de muçarela.",
+            "[Terça - 05/05/2026]: de manhã, café preto e somente isso, almoço arroz, carne assada com cebola, batatas fritas e salada de alface e tomate; a tarde, 2 fatias de wickbolds roxos + 1 fatia de peito de peru + 1 fatia de muçarela; a noite 3 copos de 180ml de Sprite 0 açucar, 1 prato com pouco arroz, bastante feijão e carne moida com farinha temperada.",
+            "[Quarta - 06/05/2026]: De manhã, cafézinho preto de lei + whey da nMax titanium Buenissimo (1 dose). Almoço com 200g de frango grelhado + arroz cremoso com creme de abóbora (200g) 4 balas, 2 de iogurte, 2 de banana Oliveira. Jantar foi um pouco de arroz, bastante feijão, carne moída e um pouco de carne de porco frita.",
+            "[Quinta - 07/05/2026]: de manhã, cafézinho preto de lei e 1 bala de iogurte. ALmoço foi frango desfiado 200g + 170g de arroz + 30g de couve. 1 bala de banana Oliveira + 1 misto quente (muçarela e peito de peru). A noite, um pprato com pouco arroz, feijao equivalente, 30g de carne de porco, 2 pedaços de lasanha de bolonhesa, de sobremesa, 1 picolé de chocolate.",
+            "[Sexta - 08/05/2026]: de manhã, duas canecas de café com leite, e 1 fatia pequena de queijo branco. Almoço foi low carb com parmegiana de Frangpo grelhado com legumes (cenoura e chuchu). A tarde 2 torradinhas integral + 1 fatia de muçarela + 1 fatia de presunto + 2 fatias de queijo branco. jantar: arroz, feijão e 1 bife bovino. 1 pedacinho de chocolate.",
+            "[Sábado - 09/05/2026]: manha: 2 paos integrais 13 grãos, 2 fatias de presunto, 1 fatia de muçarela. ALmoço: 200g de arroz branco, 1,5 colher de sopa de farinha de mandioca temperada, 250g de asinha de frango frita, 20g de chocolate. Lanche da tarde: 180ml de Sprite zero. Jantar (repeti o exato lanche do café da manhã)",
+            "[Domingo - 10/05/2026]: 2 canecas de café preto sem açúcar e leite integral.\nproporção 50/50 | sanduíche com:\n2 fatias Pão integral 7 grãos da Nutri Breads (58% integral)\n2 fatias de presunto\n1 fatia de queijo muçarela \n1 fatia pequena de queijo branco\n1 sachê pequeno (umas 10g) de maionese verde | 1 prato de aprox. 180g de macarrão com carne moída, 1 copo de 200ml de guaraná Tuba Jujuba, 1 bombom sonho de valsa | 2 fatias pão Nutri Breads 7 grãos, 1 fatia de presunto, 1 fatia de muçarela, 2 fatias pequenas de queijo branco, meio sachê de maionese branca, meio sachê de maionese verde, 2 bolachas recheadas Trakinas"
+        ],
+        "feeling_treino": [
+            "[Segunda - 04/05/2026]: Bem, ótimo ativador do meu dia, após o treino me senti preparado para enfrentar o resto.",
+            "[Terça - 05/05/2026]: Bem, me sai muito bem, experimentando corridas mais longas.",
+            "[Quarta - 06/05/2026]: Muito bem"
+        ],
+        "contexto_obstaculos": [
+            "[Segunda - 04/05/2026]: Recomeço com intensidade",
+            "[Terça - 05/05/2026]: dia 100% ok",
+            "[Quinta - 07/05/2026]: Um obstáculo que notei foi fome precoce, era de manhã, e senti.",
+            "[Sexta - 08/05/2026]: Chuva",
+            "[Sábado - 09/05/2026]: Muito feliz pelos avanços com o sistema.",
+            "[Domingo - 10/05/2026]: Sistema fluindo agora com API, satisfação aspira."
+        ]
+    },
+    "core": {
+        "dias": 4,
+        "score_medio": 799.0,
+        "taxa_execucao": 75.0,
+        "delta_cintura": 0.0
+    },
+    "extra": {
+        "dias": 3,
+        "score_medio": 913.0,
+        "taxa_execucao": 0,
+        "delta_cintura": 0.0
+    },
+    "diagnostico": []
+}

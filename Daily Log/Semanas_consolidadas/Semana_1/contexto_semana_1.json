@@ -1,0 +1,219 @@
+{
+    "timestamp_geracao": "10/05/2026 22:25",
+    "analise_longitudinal": {
+        "dias_desde_ultimo_treino": 5,
+        "status_atual": "Pronto para nova carga"
+    },
+    "memoria_do_atleta": {
+        "atleta": "Gabs",
+        "data_inicio": "27/04/2026",
+        "assinaturas_fisiologicas": {
+            "recuperacao": {
+                "tipo_predominante": "indefinido",
+                "sensibilidade_ao_sono": "critica",
+                "tolerancia_ao_drift": "moderada",
+                "prioridade_fisiologica": "estabilidade_aerobica"
+            },
+            "cardio": {
+                "fc_baseline": 55,
+                "limiar_drift_alerta": 0.05
+            }
+        },
+        "padroes_detectados": [
+            {
+                "tipo": "sabotagem_estrutural",
+                "contexto": "Final de semana",
+                "impacto": "Queda drástica no score semanal e aumento de estresse fisiológico",
+                "frequencia": 1
+            },
+            {
+                "tipo": "fadiga_latente",
+                "gatilho": "sono_baixo_pos_longo",
+                "impacto": "queda_hrv"
+            },
+            {
+                "tipo": "dependencia_de_rotina",
+                "gatilho": "quebra_estrutura_fds",
+                "impacto": "queda_aguda_de_score_e_desorganizacao_fisiologica"
+            }
+        ],
+        "historico_de_insights": [
+            {
+                "semana": 0,
+                "veredito": "Progressos legítimos apesar da baixa consistência. Sensibilidade positiva à rotina (perda de cintura com pouco esforço).",
+                "gargalo_chave": "Sabotagem no FDS"
+            }
+        ],
+        "gatilhos_de_colapso": [
+            {
+                "gatilho": "Sono < 6h30 + Treino de Alta Intensidade",
+                "consequencia": "Crash de energia prolongado (D+1, D+2)"
+            }
+        ]
+    },
+    "baseline_treino_d0": {
+        "data": "05/05/2026",
+        "readiness": null,
+        "energia": 8,
+        "stress": 28,
+        "sono_horas": 7.366666666666666,
+        "hrv": null,
+        "rhr": 51,
+        "treino_executado": "s",
+        "alimentacao_desc": "de manhã, café preto e somente isso, almoço arroz, carne assada com cebola, batatas fritas e salada de alface e tomate; a tarde, 2 fatias de wickbolds roxos + 1 fatia de peito de peru + 1 fatia de muçarela; a noite 3 copos de 180ml de Sprite 0 açucar, 1 prato com pouco arroz, bastante feijão e carne moida com farinha temperada."
+    },
+    "ultimo_treino_relevante": {
+        "id": "fit_analysis",
+        "tipo": "caminhada",
+        "score_fit": 4,
+        "drift_aerobico": 0.094,
+        "dominancia_simpatica": null,
+        "pacing_emocional": null,
+        "fluxo_util_min": null,
+        "recuperacao_fc": -0.4,
+        "gap_pace": null,
+        "esforço_perc": 3.1,
+        "data_treino": "05/05/2026"
+    },
+    "evolucao_pos_treino": {
+        "D+1": {
+            "data": "06/05/2026",
+            "readiness": null,
+            "energia": 9,
+            "stress": 36,
+            "sono_horas": 6.583333333333333,
+            "hrv": null,
+            "rhr": 56,
+            "treino_executado": "s",
+            "alimentacao_desc": "De manhã, cafézinho preto de lei + whey da nMax titanium Buenissimo (1 dose). Almoço com 200g de frango grelhado + arroz cremoso com creme de abóbora (200g) 4 balas, 2 de iogurte, 2 de banana Oliveira. Jantar foi um pouco de arroz, bastante feijão, carne moída e um pouco de carne de porco frita.",
+            "delta_vs_treino": {
+                "energia": 1
+            }
+        },
+        "D+2": {
+            "data": "07/05/2026",
+            "readiness": 76.9,
+            "energia": 9,
+            "stress": 29,
+            "sono_horas": 7.533333333333333,
+            "hrv": 73,
+            "rhr": 57,
+            "treino_executado": "n",
+            "alimentacao_desc": "de manhã, cafézinho preto de lei e 1 bala de iogurte. ALmoço foi frango desfiado 200g + 170g de arroz + 30g de couve. 1 bala de banana Oliveira + 1 misto quente (muçarela e peito de peru). A noite, um pprato com pouco arroz, feijao equivalente, 30g de carne de porco, 2 pedaços de lasanha de bolonhesa, de sobremesa, 1 picolé de chocolate.",
+            "delta_vs_treino": {
+                "energia": 1
+            }
+        },
+        "D+3": {
+            "data": "08/05/2026",
+            "readiness": 81.1,
+            "energia": 7,
+            "stress": 27,
+            "sono_horas": 7.583333333333333,
+            "hrv": 70,
+            "rhr": 55,
+            "treino_executado": "n",
+            "alimentacao_desc": "de manhã, duas canecas de café com leite, e 1 fatia pequena de queijo branco. Almoço foi low carb com parmegiana de Frangpo grelhado com legumes (cenoura e chuchu). A tarde 2 torradinhas integral + 1 fatia de muçarela + 1 fatia de presunto + 2 fatias de queijo branco. jantar: arroz, feijão e 1 bife bovino. 1 pedacinho de chocolate.",
+            "delta_vs_treino": {
+                "energia": -1
+            }
+        }
+    },
+    "meta_analise": {
+        "recuperacao": {
+            "severidade_impacto": "baixa",
+            "tempo_normalizacao_estimado_horas": 24,
+            "assinatura_recuperacao": "rápida",
+            "persistencia_fadiga": "baixa"
+        },
+        "aderencia": {
+            "baixa_execucao_pos_esforco": true,
+            "fadiga_percebida_impacto_operacional": "alta"
+        },
+        "alimentacao": {
+            "ultraprocessado_detectado": false,
+            "proteina_inconsistente": true,
+            "refeicoes_omitidas_estimadas": 0,
+            "densidade_nutricional": "boa"
+        }
+    },
+    "resumo_semana_daily": [
+        {
+            "data": "04/05/2026",
+            "readiness": null,
+            "energia": 9,
+            "stress": 29,
+            "sono_horas": 6.3,
+            "hrv": null,
+            "rhr": 55,
+            "treino_executado": "s",
+            "alimentacao_desc": "de café da manhã, quebrei o jejum com 200ml de leite integral + whey Growth cookies and Cream (1 dose), seguido de café preto puro, muita hidratação matinal, almoço reforçado com carne assada acebolada, arroz, salada de alface e tomate, batatas fritas, salzinho e vinagre de alcool.a tarde, 2 fatias de wickbold roxo + 1 fatia de peito de peru + 2 fatias de queijo muçarela. A noite foi mais fraco, 1 pedaço pequeno de bolo de chocolate, 1 caneca de leite com nescau e 2 fatias de pao wickbold roxo + 1 fatia de presunto + 1 fatia de muçarela."
+        },
+        {
+            "data": "05/05/2026",
+            "readiness": null,
+            "energia": 8,
+            "stress": 28,
+            "sono_horas": 7.366666666666666,
+            "hrv": null,
+            "rhr": 51,
+            "treino_executado": "s",
+            "alimentacao_desc": "de manhã, café preto e somente isso, almoço arroz, carne assada com cebola, batatas fritas e salada de alface e tomate; a tarde, 2 fatias de wickbolds roxos + 1 fatia de peito de peru + 1 fatia de muçarela; a noite 3 copos de 180ml de Sprite 0 açucar, 1 prato com pouco arroz, bastante feijão e carne moida com farinha temperada."
+        },
+        {
+            "data": "06/05/2026",
+            "readiness": null,
+            "energia": 9,
+            "stress": 36,
+            "sono_horas": 6.583333333333333,
+            "hrv": null,
+            "rhr": 56,
+            "treino_executado": "s",
+            "alimentacao_desc": "De manhã, cafézinho preto de lei + whey da nMax titanium Buenissimo (1 dose). Almoço com 200g de frango grelhado + arroz cremoso com creme de abóbora (200g) 4 balas, 2 de iogurte, 2 de banana Oliveira. Jantar foi um pouco de arroz, bastante feijão, carne moída e um pouco de carne de porco frita."
+        },
+        {
+            "data": "07/05/2026",
+            "readiness": 76.9,
+            "energia": 9,
+            "stress": 29,
+            "sono_horas": 7.533333333333333,
+            "hrv": 73,
+            "rhr": 57,
+            "treino_executado": "n",
+            "alimentacao_desc": "de manhã, cafézinho preto de lei e 1 bala de iogurte. ALmoço foi frango desfiado 200g + 170g de arroz + 30g de couve. 1 bala de banana Oliveira + 1 misto quente (muçarela e peito de peru). A noite, um pprato com pouco arroz, feijao equivalente, 30g de carne de porco, 2 pedaços de lasanha de bolonhesa, de sobremesa, 1 picolé de chocolate."
+        },
+        {
+            "data": "08/05/2026",
+            "readiness": 81.1,
+            "energia": 7,
+            "stress": 27,
+            "sono_horas": 7.583333333333333,
+            "hrv": 70,
+            "rhr": 55,
+            "treino_executado": "n",
+            "alimentacao_desc": "de manhã, duas canecas de café com leite, e 1 fatia pequena de queijo branco. Almoço foi low carb com parmegiana de Frangpo grelhado com legumes (cenoura e chuchu). A tarde 2 torradinhas integral + 1 fatia de muçarela + 1 fatia de presunto + 2 fatias de queijo branco. jantar: arroz, feijão e 1 bife bovino. 1 pedacinho de chocolate."
+        },
+        {
+            "data": "09/05/2026",
+            "readiness": 78.1,
+            "energia": 9,
+            "stress": 20,
+            "sono_horas": 8.2,
+            "hrv": 74,
+            "rhr": 57,
+            "treino_executado": "n",
+            "alimentacao_desc": "manha: 2 paos integrais 13 grãos, 2 fatias de presunto, 1 fatia de muçarela. ALmoço: 200g de arroz branco, 1,5 colher de sopa de farinha de mandioca temperada, 250g de asinha de frango frita, 20g de chocolate. Lanche da tarde: 180ml de Sprite zero. Jantar (repeti o exato lanche do café da manhã)"
+        },
+        {
+            "data": "10/05/2026",
+            "readiness": 80.1,
+            "energia": 10,
+            "stress": 51,
+            "sono_horas": 7.95,
+            "hrv": 73,
+            "rhr": 54,
+            "treino_executado": "n",
+            "alimentacao_desc": "2 canecas de café preto sem açúcar e leite integral.\nproporção 50/50 | sanduíche com:\n2 fatias Pão integral 7 grãos da Nutri Breads (58% integral)\n2 fatias de presunto\n1 fatia de queijo muçarela \n1 fatia pequena de queijo branco\n1 sachê pequeno (umas 10g) de maionese verde | 1 prato de aprox. 180g de macarrão com carne moída, 1 copo de 200ml de guaraná Tuba Jujuba, 1 bombom sonho de valsa | 2 fatias pão Nutri Breads 7 grãos, 1 fatia de presunto, 1 fatia de muçarela, 2 fatias pequenas de queijo branco, meio sachê de maionese branca, meio sachê de maionese verde, 2 bolachas recheadas Trakinas"
+        }
+    ]
+}

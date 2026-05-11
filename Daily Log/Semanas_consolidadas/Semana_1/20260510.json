@@ -1,0 +1,50 @@
+{
+    "data": "10/05/2026",
+    "sono": {
+        "horas": 7.95,
+        "qualidade": 81,
+        "bio_manha": 95,
+        "bio_noite": 53,
+        "rem_min": 124,
+        "profundo_min": 76,
+        "leve_min": 276
+    },
+    "estado": {
+        "energia": 10,
+        "foco": 10,
+        "estresse": 51
+    },
+    "habitos": {
+        "agua_litros": 2.5
+    },
+    "wearable": {
+        "passos": 3084,
+        "rhr": 54,
+        "pai": 49.5,
+        "hrv_ms": 73,
+        "calorias_ativas": 127,
+        "sport_load": {
+            "current": 138,
+            "optimal_min": 391,
+            "optimal_max": 911,
+            "status": null
+        }
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "2 canecas de café preto sem açúcar e leite integral.\nproporção 50/50 | sanduíche com:\n2 fatias Pão integral 7 grãos da Nutri Breads (58% integral)\n2 fatias de presunto\n1 fatia de queijo muçarela \n1 fatia pequena de queijo branco\n1 sachê pequeno (umas 10g) de maionese verde | 1 prato de aprox. 180g de macarrão com carne moída, 1 copo de 200ml de guaraná Tuba Jujuba, 1 bombom sonho de valsa | 2 fatias pão Nutri Breads 7 grãos, 1 fatia de presunto, 1 fatia de muçarela, 2 fatias pequenas de queijo branco, meio sachê de maionese branca, meio sachê de maionese verde, 2 bolachas recheadas Trakinas"
+    },
+    "treino": {
+        "planejado": "Descanso",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "feeling": ""
+    },
+    "contexto": "Sistema fluindo agora com API, satisfação aspira.",
+    "score": 914,
+    "readiness": 80.1
+}

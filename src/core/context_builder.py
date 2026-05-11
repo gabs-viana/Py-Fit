@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 
-CONSOLIDADAS_DIR = os.path.join(ROOT_DIR, "data", "database", "reports", "Semanas_consolidadas")
-FIT_DIR = os.path.join(ROOT_DIR, "data", "database", "fit_analysis")
+CONSOLIDADAS_DIR = os.path.join(ROOT_DIR, "Daily Log", "Semanas_consolidadas")
+FIT_DIR = os.path.join(ROOT_DIR, "Fit Analyzer")
 MEMORY_FILE = os.path.join(ROOT_DIR, "data", "database", "athlete_memory.json")
 
 def carregar_memoria():
