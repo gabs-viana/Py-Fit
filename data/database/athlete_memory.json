@@ -6,7 +6,9 @@
       "tipo_predominante": "indefinido",
       "sensibilidade_ao_sono": "critica",
       "tolerancia_ao_drift": "moderada",
-      "prioridade_fisiologica": "estabilidade_aerobica"
+      "prioridade_fisiologica": "estabilidade_aerobica",
+      "tipo_predominante_recuperacao": "rapida",
+      "risco_atual": "intensidade_acima_da_base"
     },
     "cardio": {
       "fc_baseline": 55,
@@ -29,6 +31,11 @@
       "tipo": "dependencia_de_rotina",
       "gatilho": "quebra_estrutura_fds",
       "impacto": "queda_aguda_de_score_e_desorganizacao_fisiologica"
+    },
+    {
+      "tipo": "recuperacao_rapida_quando_estruturado",
+      "gatilho": "sono_regular_hidratacao_execucao",
+      "impacto": "alta_estabilidade_de_readiness_e_hrv"
     }
   ],
   "historico_de_insights": [
@@ -36,6 +43,11 @@
       "semana": 0,
       "veredito": "Progressos legítimos apesar da baixa consistência. Sensibilidade positiva à rotina (perda de cintura com pouco esforço).",
       "gargalo_chave": "Sabotagem no FDS"
+    },
+    {
+      "semana": 1,
+      "veredito": "Quando rotina, hidratação e treino coexistem, o sistema sai rapidamente de fadiga aparente para alta estabilidade fisiológica.",
+      "gargalo_chave": "N/A"
     }
   ],
   "gatilhos_de_colapso": [

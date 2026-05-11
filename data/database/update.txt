@@ -2,15 +2,15 @@
 
 {
   "novo_padrao": {
-    "tipo": "dependencia_de_rotina",
-    "gatilho": "quebra_estrutura_fds",
-    "impacto": "queda_aguda_de_score_e_desorganizacao_fisiologica"
+    "tipo": "recuperacao_rapida_quando_estruturado",
+    "gatilho": "sono_regular_hidratacao_execucao",
+    "impacto": "alta_estabilidade_de_readiness_e_hrv"
   },
   "ajuste_assinatura": {
-    "sensibilidade_ao_sono": "critica",
-    "prioridade_fisiologica": "estabilidade_aerobica"
+    "tipo_predominante_recuperacao": "rapida",
+    "risco_atual": "intensidade_acima_da_base"
   },
-  "insight_semana": "O corpo responde rapidamente à estrutura mínima, mas colapsa quando continuidade desaparece."
+  "insight_semana": "Quando rotina, hidratação e treino coexistem, o sistema sai rapidamente de fadiga aparente para alta estabilidade fisiológica."
 }
 
 [/MEMORY_UPDATE]

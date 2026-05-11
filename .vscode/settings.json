@@ -1,5 +1,10 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:system",
     "totvsLanguageServer.welcomePage": false,
-    "totvsLanguageServer.editor.linter.includes": "C:\\Users\\gabriel.viana\\OneDrive - CONASA INFRAESTRUTURA S.A\\include"
+    "totvsLanguageServer.editor.linter.includes": "C:\\Users\\gabriel.viana\\OneDrive - CONASA INFRAESTRUTURA S.A\\include",
+    "files.associations": {
+        "*.PRW": "advpl",
+        "*.prw": "advpl",
+        "*.tlpp": "tlpp"
+    }
 }
