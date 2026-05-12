@@ -1,52 +1,47 @@
 {
-  "date": "2026-05-10",
+  "date": "2026-05-12",
   "readiness_index": {
     "score": 80.1,
     "status": "Recuperado",
     "components": {
-      "sleep_impact": 81,
+      "sleep_impact": 75,
       "hrv_impact": 73,
-      "recovery_impact": 87
+      "recovery_impact": 88
     }
   },
   "sleep": {
-    "total_hours": 7.95,
-    "rem_sleep_pct": 26.0,
-    "deep_sleep_pct": 16.1,
-    "light_sleep_pct": 57.9,
-    "score": 81,
+    "total_hours": 6.82,
+    "rem_sleep_pct": 26.2,
+    "deep_sleep_pct": 16.4,
+    "light_sleep_pct": 57.5,
+    "score": 75,
     "insight": "Voc\u00ea fez um \u00f3timo trabalho ao manter um hor\u00e1rio de dormir consistente na \u00faltima semana! Ter um hor\u00e1rio consistente para dormir e acordar \u00e9 uma das coisas mais importantes que voc\u00ea pode fazer para manter a sa\u00fade do seu sono."
   },
   "nutrition": {
-    "calories_in": 1593,
-    "protein": 69.6,
-    "carbs": 168.5,
-    "fat": 70.3,
-    "fiber": 10.8,
-    "meal_logs": [
-      "2 canecas de caf\u00e9 preto sem a\u00e7\u00facar e leite integral.\npropor\u00e7\u00e3o 50/50",
-      "sandu\u00edche com:\n2 fatias P\u00e3o integral 7 gr\u00e3os da Nutri Breads (58% integral)\n2 fatias de presunto\n1 fatia de queijo mu\u00e7arela \n1 fatia pequena de queijo branco\n1 sach\u00ea pequeno (umas 10g) de maionese verde",
-      "1 prato de aprox. 180g de macarr\u00e3o com carne mo\u00edda, 1 copo de 200ml de guaran\u00e1 Tuba Jujuba, 1 bombom sonho de valsa",
-      "2 fatias p\u00e3o Nutri Breads 7 gr\u00e3os, 1 fatia de presunto, 1 fatia de mu\u00e7arela, 2 fatias pequenas de queijo branco, meio sach\u00ea de maionese branca, meio sach\u00ea de maionese verde, 2 bolachas recheadas Trakinas"
-    ]
+    "calories_in": 0,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 0,
+    "fiber": 0,
+    "meal_logs": []
   },
   "biometrics": {
-    "steps": 3084,
+    "steps": 154,
     "weight": null,
     "bmi": null,
-    "rhr": 54,
+    "rhr": 53,
     "hrv": 73,
-    "readiness": 87,
-    "biocharge_waking": null,
-    "biocharge_current": 53,
-    "calories": 127,
-    "stress": 51,
-    "pai": 49.458687,
+    "readiness": 88,
+    "biocharge_waking": 91,
+    "biocharge_current": 84,
+    "calories": 15,
+    "stress": 15,
+    "pai": 13.4989,
     "pai_gain": 0,
     "workout_detected": false,
     "workout_info": null,
     "sport_load": {
-      "current": 138,
+      "current": 26,
       "optimal_min": 391,
       "optimal_max": 911,
       "status": null
@@ -55,35 +50,35 @@
   "api_source": "ZeppCloud",
   "longitudinal": {
     "baselines_30d": {
-      "hrv": 72.3,
-      "rhr": 53.8,
-      "stress": 26.4,
-      "readiness": 85.7
+      "hrv": 72.8,
+      "rhr": 53.7,
+      "stress": 26.1,
+      "readiness": 86.1
     },
     "trends": {
       "hrv": {
         "current": 73,
-        "baseline": 72.3,
-        "diff_pct": 1.0,
+        "baseline": 72.8,
+        "diff_pct": 0.3,
         "direction": "stable"
       },
       "rhr": {
-        "current": 54,
-        "baseline": 53.8,
-        "diff_pct": 0.4,
+        "current": 53,
+        "baseline": 53.7,
+        "diff_pct": -1.3,
         "direction": "stable"
       },
       "stress": {
-        "current": 51,
-        "baseline": 26.4,
-        "diff_pct": 93.2,
-        "direction": "up"
+        "current": 15,
+        "baseline": 26.1,
+        "diff_pct": -42.5,
+        "direction": "down"
       },
       "readiness": {
-        "current": 87,
-        "baseline": 85.7,
-        "diff_pct": 1.5,
-        "direction": "stable"
+        "current": 88,
+        "baseline": 86.1,
+        "diff_pct": 2.2,
+        "direction": "up"
       }
     },
     "fatigue_signatures": []

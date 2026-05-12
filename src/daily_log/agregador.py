@@ -40,6 +40,24 @@ def carregar_resumo_anterior():
                 return None
     return None
 
+def carregar_resumos_passados(qtd_semanas):
+    idx_atual = proxima_semana()
+    resumos = []
+    if idx_atual == 0:
+        return resumos
+    for i in range(1, qtd_semanas + 1):
+        idx = idx_atual - i
+        if idx < 0:
+            break
+        caminho = os.path.join(PASTA_CONSOLIDADA, f"Semana_{idx}", "resumo.json")
+        if os.path.exists(caminho):
+            with open(caminho, "r", encoding="utf-8") as f:
+                try:
+                    resumos.append(json.load(f))
+                except:
+                    pass
+    return resumos
+
 def media(lista):
     lista = [x for x in lista if x is not None]
     return round(sum(lista)/len(lista), 2) if lista else None
@@ -264,6 +282,56 @@ def calcular():
     if readiness and readiness < 60:
         diagnostico.append("Readiness médio baixo → priorizar recuperação")
         
+    # ===== CÁLCULO DE ACWR (Acute:Chronic Workload Ratio) =====
+    resumos_passados = carregar_resumos_passados(3) # Pega até 3 semanas pra trás
+    acute_load = sport_load
+    chronic_load = None
+    acwr = None
+    
+    if acute_load is not None:
+        cargas_passadas = []
+        for r in resumos_passados:
+            sl = r.get("wearable", {}).get("sport_load_media")
+            if sl is not None:
+                cargas_passadas.append(sl)
+                
+        # Chronic Load considera a semana atual + as anteriores que encontrou
+        todas_cargas = [acute_load] + cargas_passadas
+        chronic_load = media(todas_cargas)
+        
+        if chronic_load and chronic_load > 0:
+            acwr = round(acute_load / chronic_load, 2)
+            
+            if acwr < 0.8:
+                diagnostico.append(f"ACWR Baixo ({acwr}). Risco de destreinamento. Pode aumentar a carga progressivamente.")
+            elif 0.8 <= acwr <= 1.5:
+                diagnostico.append(f"ACWR Ideal ({acwr} - Sweet Spot). Carga de treinamento segura e produtiva.")
+            else:
+                diagnostico.append(f"🚨 ACWR Perigoso ({acwr}). Pico de carga agudo! Risco altíssimo de lesão, inicie tapering/descanso.")
+                
+    # ===== CÁLCULO DE TSB (Forecasting Engine) =====
+    tsb_atual = None
+    try:
+        import sys
+        if ROOT_DIR not in sys.path:
+            sys.path.append(ROOT_DIR)
+        from src.analysis.forecasting_engine import ForecastingEngine
+        engine = ForecastingEngine(ROOT_DIR)
+        
+        if semana:
+            # Data do último dia processado
+            datas_str = sorted([d["data"] for d in semana])
+            ultimo_dia_str = datas_str[-1]
+            ultimo_dia_dt = datetime.strptime(ultimo_dia_str, "%d/%m/%Y")
+            _, _, tsb_atual = engine.calculate_tsb(ultimo_dia_dt)
+            if tsb_atual is not None:
+                if tsb_atual > 5:
+                    diagnostico.append(f"TSB Positivo ({tsb_atual}). Estado de Supercompensação / Frescor.")
+                elif tsb_atual < -15:
+                    diagnostico.append(f"TSB Negativo Crítico ({tsb_atual}). Risco de Overtraining. Necessário tapering.")
+    except Exception as e:
+        print(f"⚠️ Erro ao calcular TSB no agregador: {e}")
+        
     # ===== COMPARAÇÃO (VARIÂNCIA) =====
     resumo_anterior = carregar_resumo_anterior()
     variacoes = {}
@@ -327,7 +395,11 @@ def calcular():
             "sport_load_media": sport_load
         },
         "performance": {
-            "readiness_medio": readiness
+            "readiness_medio": readiness,
+            "acwr": acwr,
+            "acute_load": acute_load,
+            "chronic_load": chronic_load,
+            "tsb_fechamento": tsb_atual
         },
         "treino": {
             "taxa_execucao": taxa_exec,

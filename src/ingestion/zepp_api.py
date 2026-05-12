@@ -14,11 +14,12 @@ class ZeppAPI:
             root_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
             config_path = os.path.join(root_dir, "config", "zepp_config.json")
             
-        with open(config_path, "r") as f:
+        self.config_path = config_path
+        with open(self.config_path, "r") as f:
             self.config = json.load(f)
             
         self.base_url = f"https://{self.config['host']}"
-        # Headers de Alta Fidelidade (Zepp 10.2.5 - Capturado no Nox)
+        # Headers de Alta Fidelidade (Zepp 10.2.5 - Clone Real do POCO)
         self.headers = {
             "User-Agent": "Zepp/10.2.5 (SM-N976N; Android 9; Density/2.0)",
             "Connection": "Keep-Alive",
@@ -46,12 +47,12 @@ class ZeppAPI:
             "appname": "com.huami.midong",
             "appv": "100491_6.4.0-play",
             "appplatform": "android_phone",
-            "device": "android_28",
+            "device": "android_33",
             "device_type": "android_phone",
             "lang": "pt_BR",
             "timezone": "America/Sao_Paulo",
-            "vn": "10.2.5",
-            "vb": "202604141233",
+            "vn": "4.0.17",
+            "vb": "20240101",
             "v": "2.0"
         }
         if params:
@@ -72,13 +73,14 @@ class ZeppAPI:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            # Se der 401 aqui, tentamos o heartbeat de novo
-            print(f"⚠️ Tentando reativar sessão para {endpoint}...")
-            self.check_session()
-            response = requests.get(url, headers=self.headers, params=base_params)
-            if response.status_code == 200:
-                return response.json()
-            print(f"❌ Erro persistente na API Zepp ({endpoint}): {e}")
+            print(f"⚠️ Erro ao buscar dados ({endpoint}): {e}. Tentando renovar a sessão (Session Replay)...")
+            if self.renew_session():
+                # Atualiza o token nos headers
+                self.headers["apptoken"] = self.config["app_token"]
+                response = requests.get(url, headers=self.headers, params=base_params)
+                if response.status_code == 200:
+                    return response.json()
+            print(f"❌ Erro persistente na API Zepp ({endpoint}) após tentativa de renovação.")
             return None
 
     def check_session(self):
@@ -97,6 +99,90 @@ class ZeppAPI:
         except:
             pass
         return False
+
+    def save_config(self):
+        """Salva as configurações atualizadas (como os novos tokens) no disco."""
+        try:
+            with open(self.config_path, "w") as f:
+                json.dump(self.config, f, indent=4)
+            print("💾 Tokens atualizados e salvos com sucesso no zepp_config.json")
+        except Exception as e:
+            print(f"❌ Erro ao salvar zepp_config.json: {e}")
+
+    def renew_session(self):
+        """Renova o login_token e o app_token simulando o tráfego legítimo (Session Replay)."""
+        print("🔄 Iniciando processo de renovação de sessão (Session Replay)...")
+        
+        # 1. Renovar o login_token
+        renew_url = "https://api-mifit-us3.zepp.com/v1/client/renew_login_token"
+        ts = str(int(time.time() * 1000))
+        dn = "api-mifit.zepp.com,api-user.zepp.com,api-mifit.zepp.com,api-watch.zepp.com,app-analytics.zepp.com,auth.zepp.com,api-analytics.zepp.com"
+        source = "com.huami.watch.hmwatchmanager:10.2.5:151830"
+        
+        renew_params = {
+            "os_version": "vnull",
+            "dn": dn,
+            "login_token": self.config.get("login_token", ""),
+            "source": source,
+            "timestamp": ts
+        }
+        
+        renew_headers = {
+            "User-Agent": "Zepp/10.2.5 (SM-N976N; Android 9; Density/2.0)",
+            "appname": "com.huami.midong",
+            "appplatform": "android_phone",
+            "v": "2.0",
+            "vn": "10.2.5",
+            "cv": "151830_10.2.5",
+            "Connection": "Keep-Alive"
+        }
+
+        try:
+            r1 = requests.get(renew_url, headers=renew_headers, params=renew_params)
+            r1.raise_for_status()
+            r1_data = r1.json()
+            
+            if r1_data.get("result") == "ok":
+                new_login_token = r1_data["token_info"]["login_token"]
+                print("✅ login_token renovado com sucesso.")
+                self.config["login_token"] = new_login_token
+            else:
+                print("❌ Falha ao renovar login_token:", r1_data)
+                return False
+                
+            # 2. Obter novo app_token usando o novo login_token
+            app_token_url = "https://api-mifit-us3.zepp.com/v1/client/app_tokens"
+            ts2 = str(int(time.time() * 1000))
+            app_token_params = {
+                "os_version": "vnull",
+                "dn": dn,
+                "login_token": new_login_token,
+                "source": source,
+                "timestamp": ts2
+            }
+            
+            r2 = requests.get(app_token_url, headers=renew_headers, params=app_token_params)
+            r2.raise_for_status()
+            r2_data = r2.json()
+            
+            if r2_data.get("result") == "ok":
+                new_app_token = r2_data["token_info"]["app_token"]
+                user_id = r2_data["token_info"]["user_id"]
+                print("✅ app_token renovado com sucesso.")
+                
+                self.config["app_token"] = new_app_token
+                self.config["user_id"] = user_id
+                
+                # Salva a configuração atualizada
+                self.save_config()
+                return True
+            else:
+                print("❌ Falha ao renovar app_token:", r2_data)
+                return False
+                
+        except Exception as e:
+            print(f"❌ Exceção durante a renovação da sessão: {e}")
+            return False
 
     def get_daily_sleep(self, date_str):
         """Pega dados de sono para uma data YYYY-MM-DD."""
@@ -193,7 +279,7 @@ class ZeppAPI:
             "eventType": "Charge",
             "subType": "real_data",
             "reverse": "true",
-            "limit": 500 if end_date else 100
+            "limit": 500
         }
         bio_data = self.fetch_data(endpoint, bio_params)
         
@@ -204,7 +290,7 @@ class ZeppAPI:
             "eventType": "readiness",
             "subType": "watch_score",
             "reverse": "true",
-            "limit": 300 if end_date else 100
+            "limit": 300
         }
         readiness_data = self.fetch_data(endpoint, readiness_params)
         
@@ -298,8 +384,9 @@ class ZeppAPI:
     def get_daily_nutrition(self, date_str):
         """Busca registros de alimentação e macros do dia (com margem de fuso)."""
         dt = datetime.strptime(date_str, "%Y-%m-%d")
-        # Alarga 6h para trás e para frente para evitar problemas de UTC/Local
-        start_ts = int((time.mktime(dt.timetuple()) - 21600) * 1000)
+        # Removemos o alarme para trás (que puxava o dia anterior)
+        start_ts = int(time.mktime(dt.timetuple()) * 1000)
+        # Alarga apenas pra frente para lidar com eventuais atrasos de sync
         end_ts = int((time.mktime(dt.timetuple()) + 86400 + 21600) * 1000)
         
         endpoint = "/v2/users/me/events"

@@ -101,6 +101,7 @@ class LongitudinalEngine:
         hrv_trend = trends.get("hrv", {}).get("direction")
         rhr_trend = trends.get("rhr", {}).get("direction")
         stress_trend = trends.get("stress", {}).get("direction")
+        readiness_trend = trends.get("readiness", {}).get("direction")
         
         # 1. Fadiga Simpática (HRV Down + RHR Up + Stress Up)
         if hrv_trend == "down" and rhr_trend == "up":
@@ -113,5 +114,9 @@ class LongitudinalEngine:
         # 3. Stress Social/Metabólico (Stress Up + HRV Down)
         if stress_trend == "up" and hrv_trend == "down":
             signatures.append("Estresse Sistêmico: Possível impacto de sono ruim ou inflamação.")
+
+        # 4. OVERTRAINING / OVERREACHING
+        if hrv_trend == "down" and readiness_trend == "down":
+            signatures.append("🚨 ALERTA DE OVERTRAINING: Queda simultânea de HRV e Prontidão! Risco iminente de lesão/overreaching.")
 
         return signatures

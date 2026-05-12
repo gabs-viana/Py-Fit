@@ -1,0 +1,50 @@
+{
+    "data": "11/05/2026",
+    "sono": {
+        "horas": 6.87,
+        "qualidade": 75,
+        "bio_manha": 93,
+        "bio_noite": 47,
+        "rem_min": 96,
+        "profundo_min": 65,
+        "leve_min": 251
+    },
+    "estado": {
+        "energia": 9,
+        "foco": 10,
+        "estresse": 51
+    },
+    "habitos": {
+        "agua_litros": 4.0
+    },
+    "wearable": {
+        "passos": 3408,
+        "rhr": 53,
+        "pai": 45.0,
+        "hrv_ms": 69,
+        "calorias_ativas": 122,
+        "sport_load": {
+            "current": 124,
+            "optimal_min": 391,
+            "optimal_max": 911,
+            "status": null
+        }
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": null
+    },
+    "alimentacao": {
+        "descricao": "400g num prato: 200g de arroz integral, 200g de carne moída com alguns poucos legumes. | 2 balinhas de iogurte | 1 caneca de 180ml de café preto sem açúcar | 2 fatias pão Wickbold roxo, 1 fatia de peito de peru e 1 fatia de muçarela | 180g de arroz branco, 40g de carne de porco frita, 15g de farinha de mandioca temperada, 1 ovo cozido, 2 ovos mexidos sem óleo"
+    },
+    "treino": {
+        "planejado": "Upper",
+        "executado": "n",
+        "completude": 0,
+        "intensidade": 0,
+        "feeling": ""
+    },
+    "contexto": "Comecei a usar escadas no trabalho para aumentar minha média de passos diária. Perdi a hora hj de manhã e tive que sacrificar o Upper... (pretendo fazer na quinta)",
+    "score": 489.5,
+    "readiness": 76.9
+}

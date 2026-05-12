@@ -113,6 +113,18 @@ def input_sn(msg, default=None):
             return val
         print("Digite 's' ou 'n'.")
 
+def input_text(msg, default=None):
+    if default:
+        print(f"\n[Atual]: {default}")
+        msg = f"{msg.strip()} (Enter para manter): "
+    else:
+        msg = f"{msg.strip()}: "
+    
+    val = input(msg).strip()
+    if val == "" and default is not None:
+        return default
+    return val
+
 def carregar_prefill(data_ref):
     # Busca na nova estrutura data/prefill
     caminho = os.path.join(ROOT_DIR, "data", "prefill", "prefill_daily.json")
@@ -141,12 +153,15 @@ def carregar_prefill(data_ref):
 def score_sono(horas, qualidade, bio_manha):
     pts = 0
 
-    if horas >= 7: pts += 140
-    elif horas >= 6: pts += 100
+    if horas and horas >= 7: pts += 140
+    elif horas and horas >= 6: pts += 100
     else: pts += 60
 
-    pts += qualidade * 1.1   # até 110 pts
-    pts += bio_manha * 1.0   # até 100 pts
+    qual = qualidade if qualidade is not None else 70
+    bio = bio_manha if bio_manha is not None else 70
+
+    pts += qual * 1.1   # até 110 pts
+    pts += bio * 1.0   # até 100 pts
 
     return min(350, int(pts))
 
@@ -160,9 +175,11 @@ def score_treino(exec, completude, intensidade):
 
     return min(400, int(pts))
 
-def score_estado(energia, foco, estresse):
-    pts = (energia * 10) + (foco * 10) + ((100 - estresse) * 0.5)
-    return min(250, pts)
+def score_estado(readiness_score, estresse):
+    r_val = readiness_score if readiness_score is not None else 70
+    e_val = estresse if estresse is not None else 50
+    pts = (r_val * 1.5) + (100 - e_val)
+    return min(250, int(pts))
 
 # =========================
 # READINESS INDEX V6
@@ -343,16 +360,15 @@ def exibir_revisao(registro):
     grupos = [
         ("💤 SONO", [
             ("Horas", f"{int(registro['sono']['horas'])}h{int((registro['sono']['horas'] % 1) * 60):02d}" if registro['sono']['horas'] else "0h00"),
-            ("Qualidade", registro["sono"]["qualidade"]),
-            ("Bio Manhã", registro["sono"]["bio_manha"]),
-            ("Bio Noite", registro["sono"]["bio_noite"]),
-            ("REM (min)", registro["sono"]["rem_min"]),
-            ("Profundo (min)", registro["sono"]["profundo_min"]),
+            ("Qualidade", registro["sono"].get("qualidade", "N/A")),
+            ("Bio Manhã", registro["sono"].get("bio_manha", "N/A")),
+            ("Bio Noite", registro["sono"].get("bio_noite", "N/A")),
+            ("REM (min)", registro["sono"].get("rem_min", "N/A")),
+            ("Profundo (min)", registro["sono"].get("profundo_min", "N/A")),
         ]),
         ("⚡ ESTADO", [
-            ("Energia", registro["estado"]["energia"]),
-            ("Foco", registro["estado"]["foco"]),
-            ("Estresse", registro["estado"]["estresse"]),
+            ("Readiness", registro["estado"].get("readiness_score", "N/A")),
+            ("Estresse", registro["estado"].get("estresse", "N/A")),
         ]),
         ("⌚ WEARABLE", [
             ("Passos", registro["wearable"]["passos"]),
@@ -401,13 +417,9 @@ def editar_campo(idx, mapping, registro):
     print(f"\nEditando [{label}]...")
     
     if label == "Horas": registro["sono"]["horas"] = input_horas("Novo valor", default=registro["sono"]["horas"])
-    elif label == "Qualidade": registro["sono"]["qualidade"] = input_int("Nova Qualidade", 0, 100, default=registro["sono"]["qualidade"])
     elif label == "Bio Manhã": registro["sono"]["bio_manha"] = input_int("Novo Bio Manhã", 0, 100, default=registro["sono"]["bio_manha"])
-    elif label == "Bio Noite": registro["sono"]["bio_noite"] = input_int("Novo Bio Noite", 0, 100, default=registro["sono"]["bio_noite"])
     elif label == "REM (min)": registro["sono"]["rem_min"] = input_int("Novo REM", 0, 500, default=registro["sono"]["rem_min"])
     elif label == "Profundo (min)": registro["sono"]["profundo_min"] = input_int("Novo Profundo", 0, 500, default=registro["sono"]["profundo_min"])
-    elif label == "Energia": registro["estado"]["energia"] = input_int("Nova Energia", 0, 10, default=registro["estado"]["energia"])
-    elif label == "Foco": registro["estado"]["foco"] = input_int("Novo Foco", 0, 10, default=registro["estado"]["foco"])
     elif label == "Estresse": registro["estado"]["estresse"] = input_int("Novo Estresse", 0, 100, default=registro["estado"]["estresse"])
     elif label == "Passos": registro["wearable"]["passos"] = input_int("Novos Passos", 0, 100000, default=registro["wearable"]["passos"])
     elif label == "RHR": registro["wearable"]["rhr"] = input_int("Novo RHR", 30, 200, default=registro["wearable"]["rhr"])
@@ -420,8 +432,8 @@ def editar_campo(idx, mapping, registro):
     elif label == "Executado": registro["treino"]["executado"] = input_sn("Executou? (s/n)", default=registro["treino"]["executado"])
     elif label == "Completude": registro["treino"]["completude"] = input_int("Nova Completude", 0, 100, default=registro["treino"]["completude"])
     elif label == "Intensidade": registro["treino"]["intensidade"] = input_int("Nova Intensidade", 0, 10, default=registro["treino"]["intensidade"])
-    elif label == "Alimentação": registro["alimentacao"]["descricao"] = input("Nova descrição: ").strip()
-    elif label == "Obstáculo": registro["contexto"] = input("Novo obstáculo: ").strip()
+    elif label == "Alimentação": registro["alimentacao"]["descricao"] = input_text("Nova descrição", default=registro["alimentacao"]["descricao"])
+    elif label == "Obstáculo": registro["contexto"] = input_text("Novo obstáculo", default=registro["contexto"])
 
 
 # =========================
@@ -436,10 +448,41 @@ def main():
 
     print(f"\n=== LOG ATLETA — {data_ref.strftime('%d/%m/%Y')} ===\n")
 
+    # FORECASTING (Módulo TSB)
+    try:
+        import sys
+        sys.path.append(ROOT_DIR)
+        from src.analysis.forecasting_engine import ForecastingEngine
+        engine = ForecastingEngine(ROOT_DIR)
+        previsoes = engine.prever_proximos_dias(dias=3)
+        if previsoes:
+            print("📈 FORECAST (TSB - Próximos dias):")
+            for p in previsoes:
+                print(f"  [{p['data']}] TSB: {p['tsb']:>5} -> {p['status']}")
+            print()
+    except Exception as e:
+        print(f"⚠️ Módulo de Forecasting indisponível: {e}\n")
+
     # PREPARAÇÃO DOS DADOS (Prefill + Defaults)
     s_data = prefill.get("sleep", {})
     b_data = prefill.get("biometrics", {})
     l_data = prefill.get("longitudinal", {})
+
+    # ALERTAS DE FADIGA / OVERTRAINING
+    signatures = l_data.get("fatigue_signatures", [])
+    if signatures:
+        treinos_base = {0: "Upper", 1: "Corrida", 2: "Lower", 4: "Futebol"}
+        amanha_weekday = (data_ref.weekday() + 1) % 7
+        treino_amanha = treinos_base.get(amanha_weekday, "Descanso")
+        
+        print("⚠️ ALERTAS FISIOLÓGICOS (Foco em Amanhã):")
+        for sig in signatures:
+            print(f"  - {sig}")
+        
+        if treino_amanha != "Descanso":
+            print(f"  > Treino planejado para amanhã: {treino_amanha}. Avalie a intensidade com base no alerta!\n")
+        else:
+            print(f"  > Amanhã é dia de Descanso. Aproveite para absorver a carga!\n")
     
     p_hrs = s_data.get("total_hours")
     p_rhr = b_data.get("rhr")
@@ -450,6 +493,9 @@ def main():
     p_pai = b_data.get("pai")
     p_peso = b_data.get("weight")
     p_bio_start = b_data.get("biocharge_waking")
+    p_bio_current = b_data.get("biocharge_current")
+    p_sleep_score = s_data.get("score")
+    p_readiness_score = prefill.get("readiness_index", {}).get("score")
     
     total_min = p_hrs * 60 if p_hrs else 0
     p_rem_min = int(total_min * (s_data.get("rem_sleep_pct", 0)/100)) if total_min else None
@@ -457,11 +503,7 @@ def main():
     p_light_min = int(total_min * (s_data.get("light_sleep_pct", 0)/100)) if total_min else None
 
     # 1. PERGUNTAS MANUAIS (O que a Zepp não sabe)
-    print("\n--- ⚡ ESTADO & MANUAIS ---")
-    energia = input_int("Energia (0-10)", 0, 10)
-    foco = input_int("Foco (0-10)", 0, 10)
-    qualidade_sono = input_int("Qualidade do Sono (0-100)", 0, 100)
-    bio_noite = input_int("Biocharge Noite (0-100)", 0, 100)
+    print("\n--- ⚡ HÁBITOS & MANUAIS ---")
     agua = input_float("Água (Litros)")
     cintura = input_float("Cintura (cm) [Enter para pular]", opcional=True)
     
@@ -477,7 +519,14 @@ def main():
     # 2. TREINO
     print("\n--- 🏋️ TREINO ---")
     treinos_base = {0: "Upper", 1: "Corrida", 2: "Lower", 4: "Futebol"}
-    planejado = treinos_base.get(dia_semana, "Descanso")
+    
+    remanejamentos = carregar_remanejamentos()
+    chave_hoje = data_ref.strftime("%Y%m%d")
+    if chave_hoje in remanejamentos:
+        planejado = remanejamentos[chave_hoje]["treino"]
+        print(f"🔄 Treino Remanejado detectado para hoje: {planejado}")
+    else:
+        planejado = treinos_base.get(dia_semana, "Descanso")
     
     # Check Workout Prefill
     w_detected = b_data.get("workout_detected", False)
@@ -488,30 +537,37 @@ def main():
         executado = "s"
         completude = 100
         intensidade = 8 # Default para treino detectado
+        feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
     else:
         print(f"Planejado: {planejado}")
         if planejado == "Descanso":
             executado, completude, intensidade = "n", 0, 0
+            feeling_treino = ""
         else:
             executado = input_sn("Executou? (s/n)")
             if executado == "s":
                 completude = input_int("Completude (%)", 0, 100)
                 intensidade = input_int("Intensidade (0-10)", 0, 10)
+                feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
             else:
                 completude, intensidade = 0, 0
+                feeling_treino = ""
+                remanejar = input_sn("Deseja remanejar este treino? (s/n)", default="s")
+                if remanejar == "s":
+                    dia_destino = escolher_dia_remanejamento(data_ref)
+                    salvar_remanejamento(dia_destino, planejado, data_ref)
 
-    feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
     obstaculo_dia = input("Obstáculo/Vitória do dia: ").strip()
 
     # MONTAGEM DO REGISTRO INICIAL
     registro = {
         "data": data_ref.strftime("%d/%m/%Y"),
         "sono": {
-            "horas": p_hrs, "qualidade": qualidade_sono, 
-            "bio_manha": p_bio_start, "bio_noite": bio_noite,
+            "horas": p_hrs, "qualidade": p_sleep_score, 
+            "bio_manha": p_bio_start, "bio_noite": p_bio_current,
             "rem_min": p_rem_min, "profundo_min": p_deep_min, "leve_min": p_light_min
         },
-        "estado": {"energia": energia, "foco": foco, "estresse": p_stress},
+        "estado": {"readiness_score": p_readiness_score, "estresse": p_stress},
         "habitos": {"agua_litros": agua},
         "wearable": {
             "passos": p_passos, "rhr": p_rhr, "pai": round(p_pai, 1) if p_pai else 0,
@@ -540,9 +596,9 @@ def main():
             print("Opção inválida.")
 
     # FINALIZAÇÃO (Cálculo de Scores e Salvamento)
-    s_sono = score_sono(registro["sono"]["horas"], registro["sono"]["qualidade"], registro["sono"]["bio_manha"])
+    s_sono = score_sono(registro["sono"]["horas"], registro["sono"].get("qualidade"), registro["sono"].get("bio_manha"))
     s_treino = score_treino(registro["treino"]["executado"], registro["treino"]["completude"], registro["treino"]["intensidade"])
-    s_estado = score_estado(registro["estado"]["energia"], registro["estado"]["foco"], registro["estado"]["estresse"])
+    s_estado = score_estado(registro["estado"].get("readiness_score"), registro["estado"].get("estresse"))
     
     if registro["treino"]["planejado"] == "Descanso":
         score_total = int(((s_sono + s_estado) / 600) * 1000)
