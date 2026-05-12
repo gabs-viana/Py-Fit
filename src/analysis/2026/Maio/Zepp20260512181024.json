@@ -1,0 +1,212 @@
+{
+  "resumo": {
+    "dist_km": 4.037,
+    "tempo_s": 2310.0,
+    "pace_medio": "9:37",
+    "fc_media": 152,
+    "fc_max": 190,
+    "calorias": 423,
+    "training_effect": 3.2,
+    "anaerobic_te": 2.1,
+    "eficiencia_global": 0.041,
+    "desvio_vel": 0.639,
+    "pct_corrida": 0.244,
+    "recuperacao_fc": -0.5,
+    "quebras": 20,
+    "drift_aerobico": 0.241,
+    "pico_eficiencia": 0.0711,
+    "altimetria_ganho_m": 56.0,
+    "altimetria_perda_m": 52.0,
+    "gap_vel_kmh": 6.25,
+    "gap_pace": "9:35",
+    "potencia_media_w": 448.7,
+    "estimativa_suor_ml": 446
+  },
+  "v6_elite": {
+    "dominancia_simpatica": "vermelho (sistema saturando)",
+    "pacing_emocional_detectado": false,
+    "tempo_fluxo_util_min": 1.0,
+    "previsao_colapso_min": 30.6
+  },
+  "clima": {
+    "temperatura_c": 15.6,
+    "umidade_pct": 72,
+    "precipitacao_mm": 0.0,
+    "vento_kmh": 0.7
+  },
+  "avaliacao": {
+    "score_0_10": 4,
+    "status_fisiologico": "fadiga alta",
+    "qualidade_execucao": "irregular",
+    "perfil_sessao": "irregular",
+    "tipo_treino_detectado": "caminhada"
+  },
+  "eficiencia_janelas": [
+    0.0485,
+    0.0495,
+    0.0482,
+    0.0711,
+    0.0461,
+    0.0418,
+    0.0592,
+    0.0547,
+    0.0428,
+    0.0316,
+    0.0607,
+    0.0525,
+    0.0321,
+    0.0317,
+    0.0333,
+    0.0498,
+    0.0401,
+    0.0338,
+    0.0651,
+    0.029,
+    0.0355,
+    0.059,
+    0.0284,
+    0.0307,
+    0.0319,
+    0.0324,
+    0.0335,
+    0.0629,
+    0.0303,
+    0.0291,
+    0.0316,
+    0.0329,
+    0.0344,
+    0.0338,
+    0.0349,
+    0.0355,
+    0.0374,
+    0.0342
+  ],
+  "blocos": [
+    {
+      "tipo": "caminhada",
+      "duracao_s": 214,
+      "fc_media": 103.1,
+      "identidade": "recuperação"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 58,
+      "fc_media": 135.0,
+      "identidade": "aquecimento eficiente"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 1,
+      "fc_media": 148.0,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 2,
+      "fc_media": 148.5,
+      "identidade": "bloco produtivo"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 104,
+      "fc_media": 132.1,
+      "identidade": "recuperação"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 139,
+      "fc_media": 163.5,
+      "identidade": "bloco produtivo"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 93,
+      "fc_media": 166.2,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 83,
+      "fc_media": 174.7,
+      "identidade": "aceleração prematura"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 1,
+      "fc_media": 179.0,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 1,
+      "fc_media": 179.0,
+      "identidade": "aceleração prematura"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 1,
+      "fc_media": 179.0,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 36,
+      "fc_media": 180.4,
+      "identidade": "aceleração prematura"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 204,
+      "fc_media": 156.4,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 56,
+      "fc_media": 169.6,
+      "identidade": "aceleração prematura"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 87,
+      "fc_media": 166.6,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 65,
+      "fc_media": 172.3,
+      "identidade": "aceleração prematura"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 111,
+      "fc_media": 165.5,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 64,
+      "fc_media": 165.7,
+      "identidade": "aceleração prematura"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 304,
+      "fc_media": 160.0,
+      "identidade": "recuperação falsa"
+    },
+    {
+      "tipo": "corrida",
+      "duracao_s": 69,
+      "fc_media": 168.7,
+      "identidade": "aceleração prematura"
+    },
+    {
+      "tipo": "caminhada",
+      "duracao_s": 618,
+      "fc_media": 149.3,
+      "identidade": "recuperação falsa"
+    }
+  ]
+}

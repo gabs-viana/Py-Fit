@@ -138,14 +138,76 @@ def carregar_prefill(data_ref):
     try:
         with open(caminho, "r", encoding='utf-8') as f:
             data = json.load(f)
-            # Verifica se a data coincide
             target_date = data_ref.strftime("%Y-%m-%d")
-            print(f"DEBUG: Comparando data {data.get('date')} com {target_date}")
             if data.get("date") == target_date:
                 return data
+    except Exception:
+        pass
+
+    # Se chegou aqui, não encontrou prefill válido para hoje. 
+    # Tenta disparar o builder automaticamente (Auto-Sustentável)
+    print(f"\n🔄 Dados de {data_ref.strftime('%d/%m/%Y')} não encontrados localmente.")
+    print("🚀 Disparando extração automática da Zepp Cloud...")
+    
+    import subprocess
+    import sys
+    builder_path = os.path.join(ROOT_DIR, "src", "ingestion", "auto_daily_builder.py")
+    try:
+        subprocess.run([sys.executable, builder_path, data_ref.strftime("%Y-%m-%d")], cwd=ROOT_DIR)
+        # Tenta carregar novamente após o builder rodar
+        with open(caminho, "r", encoding='utf-8') as f:
+            return json.load(f)
     except Exception as e:
-        print(f"Erro ao carregar prefill: {e}")
+        print(f"❌ Falha na extração automática: {e}")
+        
     return {}
+
+def merge_prefill(registro, prefill):
+    """Integra os dados do prefill no registro do daily.py"""
+    if not prefill:
+        return registro
+        
+    # Sono
+    if "sleep" in prefill:
+        s = prefill["sleep"]
+        registro["sono"]["horas"] = s.get("total_hours", registro["sono"]["horas"])
+        registro["sono"]["rem_min"] = int(s.get("rem_sleep_pct", 0) * s.get("total_hours", 0) * 0.6) # Aproximação
+        registro["sono"]["profundo_min"] = int(s.get("deep_sleep_pct", 0) * s.get("total_hours", 0) * 0.6)
+        
+    # Wearable / Biometrics
+    if "biometrics" in prefill:
+        b = prefill["biometrics"]
+        registro["wearable"]["passos"] = b.get("steps", registro["wearable"]["passos"])
+        registro["wearable"]["rhr"] = b.get("rhr", registro["wearable"]["rhr"])
+        registro["wearable"]["hrv_ms"] = b.get("hrv", registro["wearable"]["hrv_ms"])
+        registro["wearable"]["pai"] = b.get("pai", registro["wearable"]["pai"])
+        registro["wearable"]["calorias_ativas"] = b.get("calories", registro["wearable"]["calorias_ativas"])
+        registro["corpo"]["peso"] = b.get("weight", registro["corpo"]["peso"])
+        
+    # Estado
+    if "readiness_index" in prefill:
+        registro["estado"]["readiness_score"] = prefill["readiness_index"].get("score")
+        
+    # Habitos
+    if "nutrition" in prefill:
+        registro["habitos"]["agua_litros"] = prefill["nutrition"].get("water_litros", registro["habitos"]["agua_litros"])
+        registro["alimentacao"]["descricao"] = "\n".join(prefill["nutrition"].get("meal_logs", []))
+        
+    # Performance (TSB / ACWR / Forecast)
+    if "longitudinal" in prefill:
+        l = prefill["longitudinal"]
+        tsb = l.get("tsb", {})
+        forecast = l.get("forecast", {})
+        
+        registro["performance"] = {
+            "tsb": tsb.get("tsb"),
+            "acwr": tsb.get("acwr"),
+            "status": tsb.get("status"),
+            "max_safe_load": forecast.get("max_safe_load_tomorrow"),
+            "peak_day": 5 # Simplificado
+        }
+        
+    return registro
 
 # =========================
 # SCORE
@@ -377,6 +439,15 @@ def exibir_revisao(registro):
             ("HRV (ms)", registro["wearable"]["hrv_ms"]),
             ("Calorias", registro["wearable"]["calorias_ativas"]),
         ]),
+        ("📈 PERFORMANCE", [
+            ("TSB (Balance)", registro["performance"].get("tsb", "N/A")),
+            ("ACWR (Risco)", registro["performance"].get("acwr", "N/A")),
+            ("Status", registro["performance"].get("status", "N/A")),
+        ]),
+        ("🔮 PREDIÇÃO", [
+            ("Limite Amanhã", f"{registro['performance'].get('max_safe_load', 'N/A')} Carga"),
+            ("Pico Frescor", f"Em {registro['performance'].get('peak_day', 'N/A')} dias"),
+        ]),
         ("📐 CORPO/HÁBITOS", [
             ("Peso", f"{registro['corpo']['peso']} kg" if registro["corpo"]["peso"] else "Não pesado"),
             ("Cintura", registro["corpo"]["cintura"]),
@@ -460,6 +531,14 @@ def main():
             for p in previsoes:
                 print(f"  [{p['data']}] TSB: {p['tsb']:>5} -> {p['status']}")
             print()
+            
+        # Exibe TSB de HOJE (via prefill)
+        tsb_hoje = l_data.get("tsb", {})
+        if tsb_hoje:
+            print(f"📊 STATUS DE HOJE (TSB): {tsb_hoje.get('tsb')} -> {tsb_hoje.get('status')}")
+            if tsb_hoje.get("acwr", 0) > 1.5:
+                print("🚨 CUIDADO: ACWR acima de 1.5! Risco agudo de fadiga.")
+            print()
     except Exception as e:
         print(f"⚠️ Módulo de Forecasting indisponível: {e}\n")
 
@@ -504,7 +583,14 @@ def main():
 
     # 1. PERGUNTAS MANUAIS (O que a Zepp não sabe)
     print("\n--- ⚡ HÁBITOS & MANUAIS ---")
-    agua = input_float("Água (Litros)")
+    
+    p_agua = nutri_prefill.get("water_litros", 0)
+    if p_agua > 0:
+        print(f"💧 Água detectada na Zepp: {p_agua}L")
+        agua = p_agua
+    else:
+        agua = input_float("Água (Litros)")
+        
     cintura = input_float("Cintura (cm) [Enter para pular]", opcional=True)
     
     print("\n--- 🥗 ALIMENTAÇÃO ---")
@@ -534,9 +620,12 @@ def main():
     
     if w_detected:
         print(f"✅ Treino Detectado: {w_info.get('type_name')} ({w_info.get('duration_min')} min)")
+        print(f"🔥 Carga capturada: {w_info.get('load')} (Zepp Load)")
         executado = "s"
+        # Mapeamento automático de Carga para Completude/Intensidade (para manter compatibilidade de score)
+        # Se a carga é capturada, a completude é 100%. A intensidade é derivada do load (máximo 10).
         completude = 100
-        intensidade = 8 # Default para treino detectado
+        intensidade = min(10, round(w_info.get("load", 0) / 10)) if w_info.get("load") else 7
         feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
     else:
         print(f"Planejado: {planejado}")
@@ -574,6 +663,7 @@ def main():
             "hrv_ms": p_hrv, "calorias_ativas": p_cal, "sport_load": b_data.get("sport_load")
         },
         "corpo": {"cintura": cintura, "peso": p_peso},
+        "performance": {}, # Inicializa performance
         "alimentacao": {"descricao": alimentacao_texto},
         "treino": {
             "planejado": planejado, "executado": executado, 
@@ -581,6 +671,9 @@ def main():
         },
         "contexto": obstaculo_dia
     }
+
+    # Integra automações da Zepp e Longitudinal Engine
+    registro = merge_prefill(registro, prefill)
 
     # 3. LOOP DE REVISÃO E EDIÇÃO
     while True:

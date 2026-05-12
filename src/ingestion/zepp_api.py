@@ -4,7 +4,7 @@ import os
 import uuid
 import time
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class ZeppAPI:
     def __init__(self, config_path=None):
@@ -17,6 +17,19 @@ class ZeppAPI:
         self.config_path = config_path
         with open(self.config_path, "r") as f:
             self.config = json.load(f)
+            
+        # Carrega pesos adaptativos
+        weights_path = os.path.join(os.path.dirname(self.config_path), "pyfit_weights.json")
+        try:
+            with open(weights_path, "r") as f:
+                self.weights = json.load(f)["current_weights"]
+        except Exception:
+            self.weights = {
+                "sleep_impact": 0.40,
+                "zepp_readiness": 0.30,
+                "hrv_impact": 0.20,
+                "biocharge_waking": 0.10
+            }
             
         self.base_url = f"https://{self.config['host']}"
         # Headers de Alta Fidelidade (Zepp 10.2.5 - Clone Real do POCO)
@@ -34,7 +47,12 @@ class ZeppAPI:
 
     def get_common_params(self, params=None):
         """Monta os parâmetros padrão exigidos pela Zepp."""
-        call_id = str(int(time.time() * 1000))
+        # CORREÇÃO CRÍTICA DE DRIFT: 
+        # O sistema está reportando timestamp 24h à frente. 
+        # Ajustamos subtraindo 1 dia (86400s) para sincronizar com a Zepp.
+        now = datetime.now()
+        call_id = str(int((now.timestamp() - 86400) * 1000))
+        
         base_params = {
             "r": str(uuid.uuid4()),
             "t": call_id,
@@ -382,12 +400,11 @@ class ZeppAPI:
         return self.fetch_data(endpoint, params=params)
 
     def get_daily_nutrition(self, date_str):
-        """Busca registros de alimentação e macros do dia (com margem de fuso)."""
+        """Busca registros de alimentação e macros do dia (com margem ampliada para drift)."""
         dt = datetime.strptime(date_str, "%Y-%m-%d")
-        # Removemos o alarme para trás (que puxava o dia anterior)
-        start_ts = int(time.mktime(dt.timetuple()) * 1000)
-        # Alarga apenas pra frente para lidar com eventuais atrasos de sync
-        end_ts = int((time.mktime(dt.timetuple()) + 86400 + 21600) * 1000)
+        # Janela de 48h (dia anterior e dia posterior) para garantir captura com drift de relógio
+        start_ts = int((dt - timedelta(days=1)).timestamp() * 1000)
+        end_ts = int((dt + timedelta(days=1)).timestamp() * 1000)
         
         endpoint = "/v2/users/me/events"
         params = {
@@ -576,33 +593,65 @@ class ZeppAPI:
                 "status": item.get("wtlStatus")
             }
 
-        # Busca Nutrição (Macros e Logs)
+        # Busca Nutrição (Macros, Logs e ÁGUA)
         nutrition_raw = self.get_daily_nutrition(date_str)
+        
+        # Tenta também o endpoint de 'Drink' e 'Water' caso existam
+        dt = datetime.strptime(date_str, "%Y-%m-%d")
+        start_ts = int(dt.timestamp() * 1000)
+        end_ts = int((dt.timestamp() + 86400 + 21600) * 1000)
+        
+        drink_raw = self.fetch_data("/v2/users/me/events", {"eventType": "Drink", "subType": "real_data", "from": start_ts, "to": end_ts})
+        water_raw = self.fetch_data("/v2/users/me/events", {"eventType": "Water", "subType": "real_data", "from": start_ts, "to": end_ts})
+
         nutrition = {
             "calories_in": 0,
             "protein": 0,
             "carbs": 0,
             "fat": 0,
             "fiber": 0,
+            "water_litros": 0,
             "meal_logs": []
         }
+        
+        water_ml = 0
+        
+        # Processa Nutrição Tradicional
         if nutrition_raw and "items" in nutrition_raw:
             meal_texts = set()
             for item in nutrition_raw["items"]:
                 samples = item.get("value", {}).get("samples", [])
                 for s in samples:
+                    f_name = (s.get("foodName") or "").lower()
+                    f_text = (s.get("foodText") or "").lower()
+                    
+                    if "água" in f_name or "água" in f_text or "water" in f_name:
+                        water_ml += s.get("measureWeight", 0)
+                        continue
+                    
                     nutrition["calories_in"] += s.get("energy", 0)
                     nutrition["protein"] += s.get("protein", 0)
                     nutrition["carbs"] += s.get("carbohydrates", 0)
                     nutrition["fat"] += s.get("fatTotal", 0)
                     nutrition["fiber"] += s.get("fiber", 0)
-                    if s.get("foodText"):
-                        meal_texts.add(s.get("foodText").strip())
-            
+                    if s.get("foodText"): meal_texts.add(s.get("foodText").strip())
             nutrition["meal_logs"] = list(meal_texts)
-            # Rounding
-            for k in ["calories_in", "protein", "carbs", "fat", "fiber"]:
-                nutrition[k] = round(nutrition[k], 1)
+
+        # Processa Eventos de Drink/Water específicos
+        for raw in [drink_raw, water_raw]:
+            if raw and "items" in raw:
+                for item in raw["items"]:
+                    val = item.get("value", {})
+                    # A Zepp costuma salvar ml em 'value' ou dentro de samples
+                    water_ml += val.get("value") or val.get("ml") or val.get("quantity", 0)
+                    samples = val.get("samples", [])
+                    for s in samples:
+                        water_ml += s.get("ml") or s.get("value") or s.get("quantity", 0)
+
+        nutrition["water_litros"] = round(water_ml / 1000, 2)
+        # Rounding
+        for k in ["calories_in", "protein", "carbs", "fat", "fiber"]:
+            nutrition[k] = round(nutrition[k], 1)
 
         print(f"✅ Debug Final: Steps={steps}, Weight={weight}, RHR={rhr}, PAI={pai}, Stress={stress}, CalIn={nutrition['calories_in']}")
 
@@ -614,12 +663,17 @@ class ZeppAPI:
             h_val = hrv or 70
             b_val = readiness_data.get("biocharge_waking", 70) or 70
             
-            # Cálculo ponderado
-            pyfit_score = (s_score * 0.4) + (r_score * 0.3) + (min(h_val, 100) * 0.2) + (b_val * 0.1)
+            # Cálculo ponderado ADAPTATIVO
+            pyfit_score = (
+                (s_score * self.weights.get("sleep_impact", 0.40)) + 
+                (r_score * self.weights.get("zepp_readiness", 0.30)) + 
+                (min(h_val, 100) * self.weights.get("hrv_impact", 0.20)) + 
+                (b_val * self.weights.get("biocharge_waking", 0.10))
+            )
             
             # Penalidade de Carga (Overtraining Check)
             if sport_load and sport_load.get("current", 0) > sport_load.get("optimal_max", 1000):
-                pyfit_score -= 10 # Penalidade por estar acima do limite ótimo
+                pyfit_score -= 10
         
         pyfit_score = round(max(0, min(100, pyfit_score)), 1)
         

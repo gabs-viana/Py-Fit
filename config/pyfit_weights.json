@@ -1,0 +1,11 @@
+{
+  "current_weights": {
+    "sleep_impact": 0.40,
+    "zepp_readiness": 0.30,
+    "hrv_impact": 0.20,
+    "biocharge_waking": 0.10
+  },
+  "learning_rate": 0.05,
+  "last_updated": "2026-05-12",
+  "version": "1.0"
+}
