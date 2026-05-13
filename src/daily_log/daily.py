@@ -209,6 +209,63 @@ def merge_prefill(registro, prefill):
         
     return registro
 
+def processar_estado_ai(data_ref):
+    ai_state_path = os.path.join(ROOT_DIR, "data", "prefill", "ai_state.json")
+    if not os.path.exists(ai_state_path):
+        return None
+        
+    try:
+        with open(ai_state_path, "r", encoding="utf-8") as f:
+            ai_state = json.load(f)
+    except:
+        return None
+        
+    actions = ai_state.get("ai_actions", [])
+    
+    if actions:
+        print("\n" + "!"*50)
+        print(" 🤖 PROTOCOLO SENTINEL ATIVADO")
+        print("!"*50)
+        
+        for act in actions:
+            if act["action"] == "emitir_alerta_sistemico":
+                msg = act["args"].get("mensagem", "")
+                print(f"\n🚨 ALERTA CRÍTICO: {msg}\n")
+                
+        for act in actions:
+            if act["action"] == "sugerir_remanejamento_treino":
+                novo = act["args"].get("novo_treino")
+                just = act["args"].get("justificativa")
+                print(f"\n⚠️ MUDANÇA DE TREINO EXIGIDA:")
+                print(f"   Recomendação: {novo}")
+                print(f"   Motivo: {just}")
+                
+                amanha = data_ref + timedelta(days=1)
+                aceita = input_sn(f"Submeter-se ao Sentinel e alterar o treino de amanhã ({amanha.strftime('%d/%m')})? (s/n)")
+                if aceita == 's':
+                    salvar_remanejamento(amanha, novo, data_ref)
+                else:
+                    print("❌ Sugestão ignorada. Cuidado com o ego.")
+                    
+            elif act["action"] == "ajustar_meta_agua":
+                litros = act["args"].get("litros")
+                just = act["args"].get("justificativa")
+                print(f"\n💧 META DE HIDRATAÇÃO AJUSTADA:")
+                print(f"   Nova Meta: {litros}L")
+                print(f"   Motivo: {just}")
+                aceita = input_sn("Aceitar nova meta para o registro de hoje? (s/n)")
+                if aceita == 's':
+                    ai_state["temp_agua"] = litros # Salva para usar no main
+        
+        # Limpa as ações processadas
+        ai_state["ai_actions"] = []
+        try:
+            with open(ai_state_path, "w", encoding="utf-8") as f:
+                json.dump(ai_state, f, indent=2, ensure_ascii=False)
+        except: pass
+        
+    return ai_state
+
 # =========================
 # SCORE
 # =========================
@@ -582,11 +639,18 @@ def main():
     p_deep_min = int(total_min * (s_data.get("deep_sleep_pct", 0)/100)) if total_min else None
     p_light_min = int(total_min * (s_data.get("light_sleep_pct", 0)/100)) if total_min else None
 
+    # INTERVENÇÕES DO AGENTE AI
+    ai_state = processar_estado_ai(data_ref)
+    agua_sugerida_ai = ai_state.get("temp_agua") if ai_state else None
+
     # 1. PERGUNTAS MANUAIS (O que a Zepp não sabe)
     print("\n--- ⚡ HÁBITOS & MANUAIS ---")
     
     p_agua = nutri_prefill.get("water_litros", 0)
-    if p_agua > 0:
+    if agua_sugerida_ai:
+        print(f"💧 Usando meta de água exigida pelo Sentinel: {agua_sugerida_ai}L")
+        agua = agua_sugerida_ai
+    elif p_agua > 0:
         print(f"💧 Água detectada na Zepp: {p_agua}L")
         agua = p_agua
     else:

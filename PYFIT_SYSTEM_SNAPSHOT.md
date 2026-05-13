@@ -17,11 +17,11 @@ Este documento resume as capacidades definitivas do ecossistema Py-Fit, agora co
 - **Sweet Spot Detection**: Identificação visual e lógica de zonas de performance otimizada.
 - **Forecasting (5 Dias)**: Projeções de TSB e definição de **Limite de Carga Segura** para o próximo treino.
 
-## 🧠 3. Coach AI: O Oráculo Py-Fit
+## 🧠 3. Coach AI: Sentinel
 A maior evolução do sistema. Um agente de IA dedicado que mora dentro do projeto.
-- **Integração Nativa**: O Coach lê o `prefill_daily.json` e o histórico local diretamente.
-- **Veredito do Mestre**: Geração de análises técnicas, prescrições de intensidade e alertas de risco em tempo real.
-- **Instruções Dinâmicas**: Persona e regras de análise configuráveis via `Docs/COACH_PROMPT.md`.
+- **Protocolo Sentinel**: O agente lê o `prefill_daily.json` e o histórico local diretamente.
+- **Veredito do Sentinel**: Geração de análises técnicas, prescrições de intensidade e alertas de risco em tempo real.
+- **Hands-On**: Capaz de sugerir remanejamentos de treino e ajustes de metas através de function calling.
 - **Custo-Benefício Imbatível**: Uso otimizado de LLMs de alta performance (GPT-4o-mini).
 
 ## ♻️ 4. Aprendizado Adaptativo
