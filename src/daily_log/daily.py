@@ -517,6 +517,12 @@ def main():
     prefill = carregar_prefill(data_ref)
     dia_semana = data_ref.weekday()
 
+    # PREPARAÇÃO DOS DADOS (Extração antecipada para evitar erros)
+    s_data = prefill.get("sleep", {})
+    b_data = prefill.get("biometrics", {})
+    l_data = prefill.get("longitudinal", {})
+    nutri_prefill = prefill.get("nutrition", {})
+
     print(f"\n=== LOG ATLETA — {data_ref.strftime('%d/%m/%Y')} ===\n")
 
     # FORECASTING (Módulo TSB)
@@ -541,11 +547,6 @@ def main():
             print()
     except Exception as e:
         print(f"⚠️ Módulo de Forecasting indisponível: {e}\n")
-
-    # PREPARAÇÃO DOS DADOS (Prefill + Defaults)
-    s_data = prefill.get("sleep", {})
-    b_data = prefill.get("biometrics", {})
-    l_data = prefill.get("longitudinal", {})
 
     # ALERTAS DE FADIGA / OVERTRAINING
     signatures = l_data.get("fatigue_signatures", [])
@@ -594,7 +595,6 @@ def main():
     cintura = input_float("Cintura (cm) [Enter para pular]", opcional=True)
     
     print("\n--- 🥗 ALIMENTAÇÃO ---")
-    nutri_prefill = prefill.get("nutrition", {})
     logs_zepp = nutri_prefill.get("meal_logs", [])
     if logs_zepp:
         print("✅ Logs detectados na Zepp Cloud (usando automação).")

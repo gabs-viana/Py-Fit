@@ -37,6 +37,9 @@ def main():
     if not run_step("Revisão do Log Diário", [os.path.join(DAILY_LOG_DIR, "daily.py")]):
         sys.exit(1)
 
+    # 3. Veredito do Coach AI (Inteligência Preditiva)
+    run_step("Veredito do Coach AI", [os.path.join(ROOT_DIR, "src", "analysis", "ai_coach.py")])
+
     print("\n" + "="*50)
     print("✅ INTEGRAÇÃO CONCLUÍDA COM SUCESSO!")
     print("Seus dados fisiológicos e de treino estão sincronizados.")

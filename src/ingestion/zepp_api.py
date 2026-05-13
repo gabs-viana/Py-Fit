@@ -15,8 +15,24 @@ class ZeppAPI:
             config_path = os.path.join(root_dir, "config", "zepp_config.json")
             
         self.config_path = config_path
-        with open(self.config_path, "r") as f:
-            self.config = json.load(f)
+        self.config = {}
+        
+        # 1. Tenta carregar do arquivo local
+        if os.path.exists(self.config_path):
+            with open(self.config_path, "r") as f:
+                try:
+                    self.config = json.load(f)
+                except json.JSONDecodeError:
+                    print(f"⚠️ Erro ao ler {self.config_path}. Usando variáveis de ambiente.")
+        
+        # 2. Fallback para variáveis de ambiente (Open Core Security)
+        self.config["host"] = self.config.get("host") or os.getenv("ZEPP_HOST", "api-mifit-us3.zepp.com")
+        self.config["user_id"] = self.config.get("user_id") or os.getenv("ZEPP_USER_ID")
+        self.config["app_token"] = self.config.get("app_token") or os.getenv("ZEPP_APP_TOKEN")
+        self.config["login_token"] = self.config.get("login_token") or os.getenv("ZEPP_LOGIN_TOKEN")
+
+        if not self.config.get("user_id") or not self.config.get("app_token"):
+            print("❌ ATENÇÃO: Credenciais Zepp não encontradas (zepp_config.json ou Env Vars).")
             
         # Carrega pesos adaptativos
         weights_path = os.path.join(os.path.dirname(self.config_path), "pyfit_weights.json")
