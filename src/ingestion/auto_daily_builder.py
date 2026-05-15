@@ -6,26 +6,9 @@ from datetime import datetime
 # Ajuste de path para achar os módulos internos
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from normalize import TakeoutNormalizer
-from zepp_normalize import ZeppNormalizer
 from zepp_api import ZeppAPI
 from analysis.longitudinal_engine import LongitudinalEngine
 
-def find_zepp_folder(base_dir):
-    """Finds a folder that looks like a Zepp export."""
-    # Priority 1: Explicitly named ZeppExport
-    path = os.path.join(base_dir, "ZeppExport")
-    if os.path.exists(path) and os.path.isdir(path):
-        if os.path.exists(os.path.join(path, "SLEEP")):
-            return path
-            
-    # Priority 2: Numeric folder with underscore (default Zepp export name)
-    for item in os.listdir(base_dir):
-        if os.path.isdir(os.path.join(base_dir, item)):
-            if "_" in item and item.split("_")[0].isdigit():
-                if os.path.exists(os.path.join(base_dir, item, "SLEEP")):
-                    return os.path.join(base_dir, item)
-    return None
 
 def build_prefill(date_str=None):
     if date_str is None:
@@ -38,6 +21,7 @@ def build_prefill(date_str=None):
     print(f"--- Py-Fit Auto Builder ---")
     print(f"Target Date: {date_str}")
     
+    data = None
     # 1. Try Zepp API (Direct Cloud - THE GOLDEN PATH)
     config_path = os.path.join(base_dir, "config", "zepp_config.json")
     if os.path.exists(config_path):
@@ -58,20 +42,35 @@ def build_prefill(date_str=None):
                     forecast = engine.forecast_performance(tsb_metrics)
                     signatures = engine.detect_fatigue_signature(trends, tsb_metrics)
                     
+                    # --- Plano e Remanejamentos ---
+                    training_plan = {}
+                    remanejamentos = {}
+                    plan_path = os.path.join(base_dir, "config", "training_plan.json")
+                    rem_path = os.path.join(base_dir, "data", "database", "remanejamentos.json")
+                    
+                    if os.path.exists(plan_path):
+                        with open(plan_path, 'r', encoding='utf-8') as pf:
+                            training_plan = json.load(pf)
+                    if os.path.exists(rem_path):
+                        with open(rem_path, 'r', encoding='utf-8') as rf:
+                            remanejamentos = json.load(rf)
+                    
                     data["longitudinal"] = {
                         "baselines_30d": baselines,
                         "trends": trends,
                         "fatigue_signatures": signatures,
                         "tsb": tsb_metrics,
-                        "forecast": forecast
+                        "forecast": forecast,
+                        "training_plan": training_plan,
+                        "remanejamentos": remanejamentos
                     }
                     
-                    # --- Aprendizado Adaptativo ---
+                    # --- Aprendizado Adaptativo (Auto-Weight Calibration V2) ---
                     history_dir = os.path.join(base_dir, "data", "history")
                     historical_data = []
-                    # Carrega últimos 14 dias para aprendizado
+                    # Carrega últimos 30 dias para aprendizado (mínimo efetivo: 14)
                     if os.path.exists(history_dir):
-                        files = sorted([f for f in os.listdir(history_dir) if f.startswith("daily_")], reverse=True)[:14]
+                        files = sorted([f for f in os.listdir(history_dir) if f.startswith("daily_")], reverse=True)[:30]
                         for f in files:
                             try:
                                 with open(os.path.join(history_dir, f), 'r', encoding='utf-8') as hf:
@@ -79,19 +78,68 @@ def build_prefill(date_str=None):
                             except: pass
                     
                     if historical_data:
-                        new_weights = engine.calibrate_weights(historical_data, api.weights)
-                        if new_weights != api.weights:
+                        result = engine.calibrate_weights(historical_data, api.weights)
+                        if result is not None:
+                            new_weights = result["new_weights"]
+                            entry = result["calibration_entry"]
                             print(f"🧠 Adaptando pesos fisiológicos: {new_weights}")
+                            
+                            # Carrega config existente para preservar log
+                            weights_path = os.path.join(base_dir, "config", "pyfit_weights.json")
+                            existing_config = {}
+                            if os.path.exists(weights_path):
+                                try:
+                                    with open(weights_path, 'r', encoding='utf-8') as rf:
+                                        existing_config = json.load(rf)
+                                except: pass
+                            
+                            # Append ao calibration_log (mantém histórico)
+                            cal_log = existing_config.get("calibration_log", [])
+                            cal_log.append(entry)
+                            # Mantém apenas os últimos 50 registros
+                            cal_log = cal_log[-50:]
+                            
                             weights_config = {
                                 "current_weights": new_weights,
-                                "learning_rate": 0.02,
+                                "learning_rate": engine.LEARNING_RATE,
                                 "last_updated": datetime.now().strftime("%Y-%m-%d"),
-                                "version": "1.1"
+                                "version": "2.0",
+                                "bounds": dict(engine.WEIGHT_BOUNDS),
+                                "calibration_log": cal_log
                             }
-                            with open(os.path.join(base_dir, "config", "pyfit_weights.json"), 'w') as wf:
-                                json.dump(weights_config, wf, indent=2)
+                            with open(weights_path, 'w', encoding='utf-8') as wf:
+                                json.dump(weights_config, wf, indent=2, ensure_ascii=False)
                 except Exception as e:
                     print(f"⚠️ Erro ao processar tendências: {e}")
+
+                # --- Nutrition Intelligence Engine (Fases A + B + C) ---
+                nutrition_targets_path = os.path.join(base_dir, "config", "nutrition_targets.json")
+                if os.path.exists(nutrition_targets_path):
+                    try:
+                        with open(nutrition_targets_path, 'r', encoding='utf-8') as tf:
+                            targets = json.load(tf)
+
+                        nutrition_raw = data.get("nutrition", {})
+                        adherence = engine.calculate_nutrition_adherence(nutrition_raw, targets)
+                        rns = engine.calculate_rns(adherence)
+
+                        # Fase C: correlação longitudinal (14d guard clause)
+                        nutrition_correlation = engine.correlate_nutrition_recovery(historical_data) if historical_data else None
+
+                        data["nutrition_analysis"] = {
+                            "adherence": adherence,
+                            "rns": rns,
+                            "longitudinal_correlation": nutrition_correlation
+                        }
+
+                        if rns:
+                            print(f"🥗 RNS: {rns['score']}/100 ({rns['status']}) [v{rns['version']}]")
+                        if adherence:
+                            print(f"   → Proteína: {adherence['protein_g']}g / {adherence['protein_target_g']}g ({adherence['protein_adherence_pct']}%)")
+                            print(f"   → Água: {adherence['water_ml']}ml / {adherence['water_target_ml']}ml ({adherence['water_adherence_pct']}%)")
+                    except Exception as e:
+                        print(f"⚠️ Erro no Nutrition Engine: {e}")
+
             else:
                 print("⚠️ Zepp Cloud returned incomplete data. Falling back...")
                 data = None
@@ -99,29 +147,6 @@ def build_prefill(date_str=None):
             print(f"❌ Zepp Cloud Error: {e}")
             data = None
 
-    # 2. Try Local Zepp Export (High Fidelity Backup)
-    if not data:
-        # Busca na pasta data/raw
-        raw_dir = os.path.join(base_dir, "data", "raw")
-        zepp_folder = find_zepp_folder(raw_dir)
-        if zepp_folder:
-            print(f"Found Local Zepp Export: {os.path.basename(zepp_folder)}")
-            znorm = ZeppNormalizer(zepp_folder)
-            data = znorm.normalize_day(date_str)
-            if data:
-                print("✅ SUCCESS: Data retrieved from Local Zepp Export.")
-                data["confidence"] = 85 # High Fidelity but asynchronous
-    
-    # 3. Fallback to Takeout
-    if not data:
-        print(f"Zepp data not found. Falling back to Google Takeout...")
-        takeout_path = os.path.join(base_dir, "data", "raw", "Takeout")
-        if os.path.exists(takeout_path):
-            tnorm = TakeoutNormalizer(takeout_path)
-            data = tnorm.normalize_day(date_str)
-            if data:
-                print(f"SUCCESS: Data retrieved from Google Takeout.")
-                data["confidence"] = 60 # Estimated / Fallback
 
     if data:
         # Mapeamento para o Schema do daily.py

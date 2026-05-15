@@ -1,0 +1,10 @@
+{
+  "athlete_weight_kg": 64.3,
+  "protein_g_per_kg": 2.0,
+  "protein_target_g": 130,
+  "water_target_ml": 3500,
+  "fiber_target_g": 25,
+  "note": "Calorie target omitted intentionally (Phase D — requires TDEE calibration with activity tracking). Carbs target omitted for same reason.",
+  "last_updated": "2026-05-14",
+  "version": "1.0"
+}

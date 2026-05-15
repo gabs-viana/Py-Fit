@@ -1,0 +1,12 @@
+{
+  "weekly_plan": {
+    "MON": {"type": "Strength", "focus": "Upper Body", "relative_load": "Medium"},
+    "TUE": {"type": "Conditioning", "focus": "Running", "relative_load": "High"},
+    "WED": {"type": "Strength", "focus": "Lower Body", "relative_load": "High"},
+    "THU": {"type": "Recovery", "focus": "Rest", "relative_load": "Zero"},
+    "FRI": {"type": "Conditioning", "focus": "Running/Football", "relative_load": "Very High"},
+    "SAT": {"type": "Recovery", "focus": "Active Recovery/Flexibility", "relative_load": "Low"},
+    "SUN": {"type": "Recovery", "focus": "Rest", "relative_load": "Zero"}
+  },
+  "notes": "Football is temporarily replaced by Running. Upper body sessions have lower systemic impact compared to lower body or long runs."
+}

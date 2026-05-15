@@ -1,0 +1,56 @@
+{
+    "data": "13/05/2026",
+    "sono": {
+        "horas": 6.7,
+        "qualidade": 72,
+        "bio_manha": 78,
+        "bio_noite": 41,
+        "rem_min": 98,
+        "profundo_min": 82,
+        "leve_min": 219
+    },
+    "estado": {
+        "readiness_score": 70.3,
+        "estresse": 50
+    },
+    "habitos": {
+        "agua_litros": 5.0
+    },
+    "wearable": {
+        "passos": 5663,
+        "rhr": 53,
+        "pai": 60.06877,
+        "hrv_ms": 60,
+        "calorias_ativas": 491,
+        "sport_load": {
+            "current": 160,
+            "optimal_min": 391,
+            "optimal_max": 911,
+            "status": null
+        }
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": 64.3
+    },
+    "performance": {
+        "tsb": -2.2,
+        "acwr": 1.07,
+        "status": "🟢 SWEET SPOT (Evolução Otimizada)",
+        "max_safe_load": 80.0,
+        "peak_day": 5
+    },
+    "alimentacao": {
+        "descricao": "1 copo americano de Sprite 0\n200ml de Leite integral + 1 dose de Whey Growth Cookies and Cream\n2 fatias wickbold roxo, 1 mlfatia muçarela, 1 fatia peito de peru\n1 xícara de café sem açúcar\n1 Bala Mentos Mint\n2 pães franceses recheados com carne moída ao molho de tomate e cebola (buraco quente)\n265g de arroz branco, 150g de carne bovina acebolada assada, 30g de alface, 10g de tomate, 75g de batata frita palito, 180g de Feijão branco"
+    },
+    "treino": {
+        "planejado": "Lower",
+        "executado": "s",
+        "completude": 100,
+        "intensidade": 5,
+        "feeling": "Show, completinho o Leg Day."
+    },
+    "contexto": "Retomada dos treinos na academia.",
+    "score": 712,
+    "readiness": 70.3
+}

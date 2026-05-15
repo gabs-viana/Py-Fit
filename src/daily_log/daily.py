@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from datetime import datetime
 from datetime import timedelta
 
@@ -34,6 +35,48 @@ def salvar_dia(registro, data_ref):
         json.dump(registro, f, indent=4, ensure_ascii=False)
 
     print(f"\n✅ Salvo em {caminho}")
+
+# =========================
+# SNAPSHOT CACHE (Otimização Gabs)
+# =========================
+CACHE_FILE = os.path.join(ROOT_DIR, "data", "prefill", "daily_cache.json")
+
+def salvar_cache(registro, data_ref):
+    cache = {
+        "date": data_ref.strftime("%Y-%m-%d"),
+        "manual_data": {
+            "agua": registro["habitos"]["agua_litros"],
+            "cintura": registro["corpo"]["cintura"],
+            "alimentacao": registro["alimentacao"]["descricao"],
+            "executado": registro["treino"]["executado"],
+            "completude": registro["treino"]["completude"],
+            "intensidade": registro["treino"]["intensidade"],
+            "feeling": registro["treino"]["feeling"],
+            "contexto": registro["contexto"]
+        }
+    }
+    with open(CACHE_FILE, "w", encoding='utf-8') as f:
+        json.dump(cache, f, indent=4, ensure_ascii=False)
+    print(f"\n💾 Snapshot salvo em {CACHE_FILE}. Até mais tarde!")
+
+def carregar_cache(data_ref):
+    if not os.path.exists(CACHE_FILE):
+        return None
+    try:
+        with open(CACHE_FILE, "r", encoding='utf-8') as f:
+            cache = json.load(f)
+            if cache.get("date") == data_ref.strftime("%Y-%m-%d"):
+                return cache.get("manual_data")
+    except:
+        pass
+    return None
+
+def limpar_cache():
+    if os.path.exists(CACHE_FILE):
+        try:
+            os.remove(CACHE_FILE)
+            print("🧹 Cache limpo.")
+        except: pass
 
 # =========================
 # INPUTS
@@ -173,6 +216,8 @@ def merge_prefill(registro, prefill):
         registro["sono"]["horas"] = s.get("total_hours", registro["sono"]["horas"])
         registro["sono"]["rem_min"] = int(s.get("rem_sleep_pct", 0) * s.get("total_hours", 0) * 0.6) # Aproximação
         registro["sono"]["profundo_min"] = int(s.get("deep_sleep_pct", 0) * s.get("total_hours", 0) * 0.6)
+        registro["sono"]["bio_manha"] = prefill["biometrics"].get("biocharge_waking", registro["sono"]["bio_manha"])
+        registro["sono"]["bio_noite"] = prefill["biometrics"].get("biocharge_current", registro["sono"]["bio_noite"])
         
     # Wearable / Biometrics
     if "biometrics" in prefill:
@@ -533,7 +578,8 @@ def exibir_revisao(registro):
             idx += 1
     
     print("\n" + "="*40)
-    print(" 0. ✅ CONFIRMAR TUDO E SALVAR")
+    print(" 99. 💾 SALVAR SNAPSHOT (CACHE)")
+    print("  0. ✅ CONFIRMAR TUDO E SALVAR")
     print("="*40)
     return mapping
 
@@ -546,6 +592,7 @@ def editar_campo(idx, mapping, registro):
     
     if label == "Horas": registro["sono"]["horas"] = input_horas("Novo valor", default=registro["sono"]["horas"])
     elif label == "Bio Manhã": registro["sono"]["bio_manha"] = input_int("Novo Bio Manhã", 0, 100, default=registro["sono"]["bio_manha"])
+    elif label == "Bio Noite": registro["sono"]["bio_noite"] = input_int("Novo Bio Noite", 0, 100, default=registro["sono"]["bio_noite"])
     elif label == "REM (min)": registro["sono"]["rem_min"] = input_int("Novo REM", 0, 500, default=registro["sono"]["rem_min"])
     elif label == "Profundo (min)": registro["sono"]["profundo_min"] = input_int("Novo Profundo", 0, 500, default=registro["sono"]["profundo_min"])
     elif label == "Estresse": registro["estado"]["estresse"] = input_int("Novo Estresse", 0, 100, default=registro["estado"]["estresse"])
@@ -582,28 +629,26 @@ def main():
 
     print(f"\n=== LOG ATLETA — {data_ref.strftime('%d/%m/%Y')} ===\n")
 
-    # FORECASTING (Módulo TSB)
-    try:
-        import sys
-        sys.path.append(ROOT_DIR)
-        from src.analysis.forecasting_engine import ForecastingEngine
-        engine = ForecastingEngine(ROOT_DIR)
-        previsoes = engine.prever_proximos_dias(dias=3)
-        if previsoes:
-            print("📈 FORECAST (TSB - Próximos dias):")
-            for p in previsoes:
-                print(f"  [{p['data']}] TSB: {p['tsb']:>5} -> {p['status']}")
-            print()
+    # FORECASTING (Módulo TSB - Integrado via Longitudinal Engine)
+    forecast_data = l_data.get("forecast", {}).get("rest_projection", [])
+    if forecast_data:
+        print("📈 FORECAST (TSB - Próximos dias):")
+        for p in forecast_data:
+            # Status simplificado para exibição no terminal
+            status = "🟡 Absorvendo carga"
+            if p.get('tsb', 0) > 5: status = "🚀 Supercompensação"
+            elif p.get('acwr', 0) > 1.3: status = "⚠️ Risco de Lesão (ACWR Alto)"
             
-        # Exibe TSB de HOJE (via prefill)
-        tsb_hoje = l_data.get("tsb", {})
-        if tsb_hoje:
-            print(f"📊 STATUS DE HOJE (TSB): {tsb_hoje.get('tsb')} -> {tsb_hoje.get('status')}")
-            if tsb_hoje.get("acwr", 0) > 1.5:
-                print("🚨 CUIDADO: ACWR acima de 1.5! Risco agudo de fadiga.")
-            print()
-    except Exception as e:
-        print(f"⚠️ Módulo de Forecasting indisponível: {e}\n")
+            print(f"  [{p['date']}] TSB: {p['tsb']:>5} -> {status}")
+        print()
+            
+    # Exibe TSB de HOJE (via prefill)
+    tsb_hoje = l_data.get("tsb", {})
+    if tsb_hoje:
+        print(f"📊 STATUS DE HOJE (TSB): {tsb_hoje.get('tsb')} -> {tsb_hoje.get('status')}")
+        if tsb_hoje.get("acwr", 0) > 1.5:
+            print("🚨 CUIDADO: ACWR acima de 1.5! Risco agudo de fadiga.")
+        print()
 
     # ALERTAS DE FADIGA / OVERTRAINING
     signatures = l_data.get("fatigue_signatures", [])
@@ -643,74 +688,99 @@ def main():
     ai_state = processar_estado_ai(data_ref)
     agua_sugerida_ai = ai_state.get("temp_agua") if ai_state else None
 
-    # 1. PERGUNTAS MANUAIS (O que a Zepp não sabe)
-    print("\n--- ⚡ HÁBITOS & MANUAIS ---")
+    # SNAPSHOT CACHE DETECTION
+    cache = carregar_cache(data_ref)
+    usando_cache = False
+    if cache:
+        print("\n⚡ SNAPSHOT DETECTADO: Restaurando variáveis manuais...")
+        usando_cache = True
+        agua = cache["agua"]
+        cintura = cache["cintura"]
+        alimentacao_texto = cache["alimentacao"]
+        executado = cache["executado"]
+        completude = cache["completude"]
+        intensidade = cache["intensidade"]
+        feeling_treino = cache["feeling"]
+        obstaculo_dia = cache["contexto"]
     
-    p_agua = nutri_prefill.get("water_litros", 0)
-    if agua_sugerida_ai:
-        print(f"💧 Usando meta de água exigida pelo Sentinel: {agua_sugerida_ai}L")
-        agua = agua_sugerida_ai
-    elif p_agua > 0:
-        print(f"💧 Água detectada na Zepp: {p_agua}L")
-        agua = p_agua
-    else:
-        agua = input_float("Água (Litros)")
+    # 1. PERGUNTAS MANUAIS (Pula se houver cache)
+    if not usando_cache:
+        print("\n--- ⚡ HÁBITOS & MANUAIS ---")
         
-    cintura = input_float("Cintura (cm) [Enter para pular]", opcional=True)
-    
-    print("\n--- 🥗 ALIMENTAÇÃO ---")
-    logs_zepp = nutri_prefill.get("meal_logs", [])
-    if logs_zepp:
-        print("✅ Logs detectados na Zepp Cloud (usando automação).")
-        alimentacao_texto = " | ".join(logs_zepp)
-    else:
-        alimentacao_texto = input("Descreva sua alimentação (Vazio para pular): ").strip()
-
-    # 2. TREINO
-    print("\n--- 🏋️ TREINO ---")
-    treinos_base = {0: "Upper", 1: "Corrida", 2: "Lower", 4: "Futebol"}
-    
-    remanejamentos = carregar_remanejamentos()
-    chave_hoje = data_ref.strftime("%Y%m%d")
-    if chave_hoje in remanejamentos:
-        planejado = remanejamentos[chave_hoje]["treino"]
-        print(f"🔄 Treino Remanejado detectado para hoje: {planejado}")
-    else:
-        planejado = treinos_base.get(dia_semana, "Descanso")
-    
-    # Check Workout Prefill
-    w_detected = b_data.get("workout_detected", False)
-    w_info = b_data.get("workout_info", {})
-    
-    if w_detected:
-        print(f"✅ Treino Detectado: {w_info.get('type_name')} ({w_info.get('duration_min')} min)")
-        print(f"🔥 Carga capturada: {w_info.get('load')} (Zepp Load)")
-        executado = "s"
-        # Mapeamento automático de Carga para Completude/Intensidade (para manter compatibilidade de score)
-        # Se a carga é capturada, a completude é 100%. A intensidade é derivada do load (máximo 10).
-        completude = 100
-        intensidade = min(10, round(w_info.get("load", 0) / 10)) if w_info.get("load") else 7
-        feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
-    else:
-        print(f"Planejado: {planejado}")
-        if planejado == "Descanso":
-            executado, completude, intensidade = "n", 0, 0
-            feeling_treino = ""
+        p_agua = nutri_prefill.get("water_litros", 0)
+        if agua_sugerida_ai:
+            print(f"💧 Usando meta de água exigida pelo Sentinel: {agua_sugerida_ai}L")
+            agua = agua_sugerida_ai
+        elif p_agua > 0:
+            print(f"💧 Água detectada na Zepp: {p_agua}L")
+            agua = p_agua
         else:
-            executado = input_sn("Executou? (s/n)")
-            if executado == "s":
-                completude = input_int("Completude (%)", 0, 100)
-                intensidade = input_int("Intensidade (0-10)", 0, 10)
-                feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
-            else:
-                completude, intensidade = 0, 0
-                feeling_treino = ""
-                remanejar = input_sn("Deseja remanejar este treino? (s/n)", default="s")
-                if remanejar == "s":
-                    dia_destino = escolher_dia_remanejamento(data_ref)
-                    salvar_remanejamento(dia_destino, planejado, data_ref)
+            agua = input_float("Água (Litros)")
+            
+        cintura = input_float("Cintura (cm) [Enter para pular]", opcional=True)
+        
+        print("\n--- 🥗 ALIMENTAÇÃO ---")
+        logs_zepp = nutri_prefill.get("meal_logs", [])
+        if logs_zepp:
+            print("✅ Logs detectados na Zepp Cloud (usando automação).")
+            alimentacao_texto = " | ".join(logs_zepp)
+        else:
+            alimentacao_texto = input("Descreva sua alimentação (Vazio para pular): ").strip()
 
-    obstaculo_dia = input("Obstáculo/Vitória do dia: ").strip()
+        # 2. TREINO
+        print("\n--- 🏋️ TREINO ---")
+        treinos_base = {0: "Upper", 1: "Corrida", 2: "Lower", 4: "Futebol"}
+        
+        remanejamentos = carregar_remanejamentos()
+        chave_hoje = data_ref.strftime("%Y%m%d")
+        if chave_hoje in remanejamentos:
+            planejado = remanejamentos[chave_hoje]["treino"]
+            print(f"🔄 Treino Remanejado detectado para hoje: {planejado}")
+        else:
+            planejado = treinos_base.get(dia_semana, "Descanso")
+        
+        # Check Workout Prefill
+        w_detected = b_data.get("workout_detected", False)
+        w_info = b_data.get("workout_info", {})
+        
+        if w_detected:
+            print(f"✅ Treino Detectado: {w_info.get('type_name')} ({w_info.get('duration_min')} min)")
+            print(f"🔥 Carga capturada: {w_info.get('load')} (Zepp Load)")
+            executado = "s"
+            # Mapeamento automático de Carga para Completude/Intensidade (para manter compatibilidade de score)
+            # Se a carga é capturada, a completude é 100%. A intensidade é derivada do load (máximo 10).
+            completude = 100
+            intensidade = min(10, round(w_info.get("load", 0) / 10)) if w_info.get("load") else 7
+            feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
+        else:
+            print(f"Planejado: {planejado}")
+            if planejado == "Descanso":
+                executado, completude, intensidade = "n", 0, 0
+                feeling_treino = ""
+            else:
+                executado = input_sn("Executou? (s/n)")
+                if executado == "s":
+                    completude = input_int("Completude (%)", 0, 100)
+                    intensidade = input_int("Intensidade (0-10)", 0, 10)
+                    feeling_treino = input("Feeling do treino (Enter para pular): ").strip()
+                else:
+                    completude, intensidade = 0, 0
+                    feeling_treino = ""
+                    remanejar = input_sn("Deseja remanejar este treino? (s/n)", default="s")
+                    if remanejar == "s":
+                        dia_destino = escolher_dia_remanejamento(data_ref)
+                        salvar_remanejamento(dia_destino, planejado, data_ref)
+
+        obstaculo_dia = input("Obstáculo/Vitória do dia: ").strip()
+    else:
+        # Se usar cache, ainda precisamos saber qual era o planejado para o registro
+        treinos_base = {0: "Upper", 1: "Corrida", 2: "Lower", 4: "Futebol"}
+        remanejamentos = carregar_remanejamentos()
+        chave_hoje = data_ref.strftime("%Y%m%d")
+        if chave_hoje in remanejamentos:
+            planejado = remanejamentos[chave_hoje]["treino"]
+        else:
+            planejado = treinos_base.get(dia_semana, "Descanso")
 
     # MONTAGEM DO REGISTRO INICIAL
     registro = {
@@ -745,8 +815,13 @@ def main():
         escolha = input("\nDigite o ID para editar ou 0 para SALVAR: ").strip()
         
         if escolha == "0":
+            limpar_cache()
             break
         
+        if escolha == "99":
+            salvar_cache(registro, data_ref)
+            sys.exit(99)
+
         if escolha.isdigit():
             editar_campo(int(escolha), mapping, registro)
         else:

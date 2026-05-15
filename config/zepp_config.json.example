@@ -1,0 +1,6 @@
+{
+  "user_id": "SEU_USER_ID_AQUI",
+  "app_token": "SEU_APP_TOKEN_AQUI",
+  "device_id": "SEU_DEVICE_ID_AQUI",
+  "note": "Este arquivo contém credenciais sensíveis. Nunca remova do .gitignore."
+}

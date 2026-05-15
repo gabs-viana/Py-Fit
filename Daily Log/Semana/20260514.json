@@ -1,0 +1,56 @@
+{
+    "data": "14/05/2026",
+    "sono": {
+        "horas": 6.77,
+        "qualidade": 75,
+        "bio_manha": 87,
+        "bio_noite": 37,
+        "rem_min": 99,
+        "profundo_min": 73,
+        "leve_min": 233
+    },
+    "estado": {
+        "readiness_score": 76.2,
+        "estresse": 27
+    },
+    "habitos": {
+        "agua_litros": 5.0
+    },
+    "wearable": {
+        "passos": 7760,
+        "rhr": 54,
+        "pai": 68.5264,
+        "hrv_ms": 73,
+        "calorias_ativas": 517,
+        "sport_load": {
+            "current": 177,
+            "optimal_min": 391,
+            "optimal_max": 911,
+            "status": null
+        }
+    },
+    "corpo": {
+        "cintura": 76.0,
+        "peso": 64.3
+    },
+    "performance": {
+        "tsb": 0.1,
+        "acwr": 1.0,
+        "status": "🟢 SWEET SPOT (Evolução Otimizada)",
+        "max_safe_load": 92.0,
+        "peak_day": 5
+    },
+    "alimentacao": {
+        "descricao": "1 caneca de 200ml de café preto sem açúcar\n2 bolachas recheadas Itamaraty sabor limão\n150g de pipoca com sal\n200g de frango grelhado + 200g de arroz com creme de abóbora\n300ml de leite integral + 40g de Whey Max Titanium Bueníssimo\n200g de macarrão com atum\n150ml de Coca zero\n1 copo americano de Sprite 0\n400ml de Coca 0\n2 fatias pão Nutrir Pão, 1 fatia presunto Sadia Low Sódio, 1 fatia muçarela Tirol"
+    },
+    "treino": {
+        "planejado": "Upper",
+        "executado": "s",
+        "completude": 100,
+        "intensidade": 2,
+        "feeling": "Show, consegui executar bem, e até progredir Reps em alguns exercicios."
+    },
+    "contexto": "Comecei a vir de a pé para o trabalho depois da academia para aumentar minha média de passos semanal. (1.8km)",
+    "score": 696,
+    "readiness": 76.2
+}

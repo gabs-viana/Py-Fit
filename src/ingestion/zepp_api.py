@@ -331,23 +331,48 @@ class ZeppAPI:
         if end_date:
             return {"bio": bio_data, "readiness": readiness_data}
 
-        # Lógica legado para dia único
+        # Localiza o item de Biocharge correto para o dia (aquele que começa antes ou na meia-noite do dia alvo)
+        target_midnight = int(time.mktime(dt.timetuple()) * 1000)
+        bio_item = None
+        if bio_data and "items" in bio_data:
+            for item in bio_data["items"]:
+                if item.get("timestamp", 0) <= target_midnight:
+                    bio_item = item
+                    break
+        
+        # Se não achou por timestamp, tenta o primeiro (fallback legado)
+        if not bio_item and bio_data and "items" in bio_data and bio_data["items"]:
+            bio_item = bio_data["items"][0]
+
         bio_current = None
         bio_waking = None
-        if bio_data and "items" in bio_data and bio_data["items"]:
-            samples = bio_data["items"][0].get("value", {}).get("samples", [])
+        if bio_item:
+            samples = bio_item.get("value", {}).get("samples", [])
             if samples:
                 for s in reversed(samples):
                     if s.get("total", 255) < 255:
                         bio_current = s["total"]
                         break
-                morning = [s["total"] for s in samples if 21600000 < s.get("s",0) < 39600000 and s.get("total", 255) < 255]
-                if morning: bio_waking = max(morning)
+                # Janela ampliada: 04:00 (14400s) até 11:00 (39600s)
+                # Biocharge costuma atingir o PICO ao acordar. Pegar o MAX na janela é mais robusto que o primeiro.
+                morning = [s["total"] for s in samples if 14400000 <= s.get("s",0) <= 39600000 and s.get("total", 255) < 255]
+                if morning: 
+                    bio_waking = max(morning) # Heurística: Pico de carga pós-sono
+                elif samples:
+                    bio_waking = samples[0].get("total")
         
         hrv = None
         readiness = None
-        if readiness_data and "items" in readiness_data and readiness_data["items"]:
-            val = readiness_data["items"][0].get("value", {})
+        # Localiza o item de Readiness correto (mais recente que não seja do dia seguinte)
+        rdn_item = None
+        if readiness_data and "items" in readiness_data:
+            for item in readiness_data["items"]:
+                if item.get("timestamp", 0) <= (target_midnight + 86400000): # Pode ser até o final do dia
+                    rdn_item = item
+                    break
+        
+        if rdn_item:
+            val = rdn_item.get("value", {})
             hrv = val.get("sleepHRV") or val.get("hrvScore")
             readiness = val.get("rdnsScore")
             
@@ -462,20 +487,23 @@ class ZeppAPI:
         return None
 
     def get_weight_records(self, date_str):
-        """Busca histórico de peso com headers cirúrgicos."""
-        url = f"https://api-mifit-us3.zepp.com/users/{self.config['user_id']}/members/-1/weightRecords"
-        headers = {
-            "Authorization": f"Bearer {self.config['app_token']}",
-            "apptoken": self.config["app_token"],
-            "User-Agent": "Zepp/10.2.5 (SM-N976N; Android 9; Density/2.0)"
+        """Busca histórico de peso usando o protocolo completo fetch_data."""
+        endpoint = f"/users/{self.config['user_id']}/members/-1/weightRecords"
+        params = {"limit": 10}
+        
+        data = self.fetch_data(endpoint, params)
+        if data and "items" in data:
+            return data
+            
+        # Fallback: Tenta via Eventos V2 se o endpoint de peso falhar
+        endpoint_v2 = "/v2/users/me/events"
+        params_v2 = {
+            "limit": 5,
+            "eventType": "Weight",
+            "subType": "real_data",
+            "reverse": "true"
         }
-        try:
-            r = requests.get(url, headers=headers, params={"limit": 5}, timeout=10)
-            if r.status_code == 200:
-                return r.json()
-        except:
-            pass
-        return None
+        return self.fetch_data(endpoint_v2, params_v2)
 
 
     def normalize_for_daily(self, date_str):
@@ -556,6 +584,9 @@ class ZeppAPI:
         # Busca Readiness e Biocharge (Combo HRV incluso)
         readiness_data = self.get_readiness_score(date_str)
         hrv = readiness_data.get("hrv")
+        readiness_score = readiness_data.get("score")
+        bio_waking = readiness_data.get("bio_waking")
+        bio_current = readiness_data.get("bio_current")
         
         # Busca Peso e BMI
         weight_data = self.get_weight_records(date_str)
@@ -567,18 +598,15 @@ class ZeppAPI:
             elif isinstance(weight_data, dict): items = weight_data.get("items", [])
             
             if items:
-                # Pega o mais recente e verifica se é de HOJE (date_str)
+                # Pega o mais recente da lista (estratégia de fallback para 'último peso conhecido')
                 latest = items[0]
-                gen_time = latest.get("generatedTime")
-                if gen_time:
-                    # Converte generatedTime (segundos) para data YYYY-MM-DD
-                    record_date = datetime.fromtimestamp(gen_time).strftime("%Y-%m-%d")
-                    if record_date == date_str:
-                        w_summary = latest.get("summary", {})
-                        weight = w_summary.get("weight")
-                        bmi = w_summary.get("bmi")
-                    else:
-                        print(f"⚖️ Peso ignorado: Registro mais recente é de {record_date} (esperado {date_str})")
+                w_summary = latest.get("summary", {})
+                weight = w_summary.get("weight")
+                bmi = w_summary.get("bmi")
+        
+        # 2. Fallback: Tenta extrair do sumário unificado (stp -> wgt ou similar)
+        if weight is None:
+            weight = summary.get("wgt") or summary.get("weight")
 
         # Busca Estresse (Estratégia Híbrida: Sumário -> Média de Pontuais)
         stress = None
